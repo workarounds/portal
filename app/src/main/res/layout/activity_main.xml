@@ -30,6 +30,7 @@
     <EditText
         android:id="@+id/et_portlet_id"
         android:hint="Portlet id"
+        android:text="10"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 

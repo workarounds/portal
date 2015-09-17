@@ -1,33 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<in.workarounds.portal.WrapperLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="#ff112233"
+    android:layout_gravity="center_horizontal"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
 
-    <Button
-        android:id="@+id/btn_open_portal"
-        android:text="Open Portal"
+    <LinearLayout
+        android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-    <Button
-        android:id="@+id/btn_show_portal"
-        android:text="Show Portal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-    <Button
-        android:id="@+id/btn_hide_portal"
-        android:text="Hide Portal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-    <Button
-        android:id="@+id/btn_close_portal"
-        android:text="Close Portal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:orientation="vertical">
 
-    <Button
-        android:id="@+id/btn_close_service"
-        android:text="Close service"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        <Button
+            android:id="@+id/btn_open_portal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Open Portal" />
 
-</LinearLayout>
+        <Button
+            android:id="@+id/btn_show_portal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Show Portal" />
+
+        <Button
+            android:id="@+id/btn_hide_portal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hide Portal" />
+
+        <Button
+            android:id="@+id/btn_close_portal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Close Portal" />
+
+        <Button
+            android:id="@+id/btn_close_service"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Close service" />
+
+    </LinearLayout>
+</in.workarounds.portal.WrapperLayout>
