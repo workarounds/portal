@@ -95,6 +95,7 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
                 break;
             case INTENT_TYPE_CLOSE_PORTAL:
                 closePortal();
+                checkForTermination();
                 break;
             case INTENT_TYPE_OPEN_PORTLET:
                 openPortlet(intent);
@@ -107,6 +108,7 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
                 break;
             case INTENT_TYPE_CLOSE_PORTLET:
                 closePortlet(intent.getIntExtra(INTENT_KEY_PORTLET_ID, -1));
+                checkForTermination();
                 break;
             case INTENT_TYPE_CLOSE_MANAGER:
                 closeManager();
@@ -378,6 +380,12 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
         Intent intent = new Intent(context, type);
         intent.putExtra(PortalManager.INTENT_KEY_INTENT_TYPE, PortalManager.INTENT_TYPE_CLOSE_MANAGER);
         context.startService(intent);
+    }
+
+    private void checkForTermination() {
+        if(mPortal == null && mPortlets.isEmpty()) {
+            stopSelf();
+        }
     }
 
     @IntDef({INTENT_TYPE_NO_TYPE, INTENT_TYPE_OPEN_PORTAL, INTENT_TYPE_SHOW_PORTAL,
