@@ -56,4 +56,12 @@ public class Portlet extends AbstractPortal {
     protected Portal getPortal() {
         return mPortalManager.getPortal();
     }
+
+    protected void closeAll() {
+        mPortalManager.stopSelf();
+    }
+
+    public static PortletBuilder with(Context context) {
+        return new PortletBuilder(context);
+    }
 }

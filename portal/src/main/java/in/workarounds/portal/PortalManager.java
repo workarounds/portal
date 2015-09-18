@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -40,11 +41,9 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
 
     protected static final int INTENT_TYPE_CLOSE_MANAGER = 100;
 
-    protected static final String INTENT_KEY_PORTAL_CLASS = "intent_key_portal_class";
-    protected static final String INTENT_KEY_PORTAL_DATA  = "intent_key_portal_data";
+    protected static final String INTENT_KEY_CLASS = "intent_key_class";
+    protected static final String INTENT_KEY_DATA = "intent_key_data";
 
-    protected static final String INTENT_KEY_PORTLET_CLASS  = "intent_key_portlet_class";
-    protected static final String INTENT_KEY_PORTLET_DATA   = "intent_key_portlet_data";
     protected static final String INTENT_KEY_PORTLET_ID     = "intent_key_portlet_id";
 
     protected Portal mPortal;
@@ -144,9 +143,9 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
 
     @Nullable
     protected Portal createPortal(Intent intent) {
-        Portal portal = constructPortal(intent.getStringExtra(INTENT_KEY_PORTAL_CLASS));
+        Portal portal = constructPortal(intent.getStringExtra(INTENT_KEY_CLASS));
         if(portal != null) {
-            portal.onCreate(intent.getBundleExtra(INTENT_KEY_PORTAL_DATA));
+            portal.onCreate(intent.getBundleExtra(INTENT_KEY_DATA));
             portal.setPortalManager(this);
         } else {
             Log.e(TAG, "Problem creating portal");
@@ -159,9 +158,9 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
         int portletId = intent.getIntExtra(INTENT_KEY_PORTLET_ID, -1);
         Portlet portlet = null;
         if(portletId != -1) {
-            portlet = constructPortlet(intent.getStringExtra(INTENT_KEY_PORTLET_CLASS), portletId);
+            portlet = constructPortlet(intent.getStringExtra(INTENT_KEY_CLASS), portletId);
             if(portlet != null) {
-                portlet.onCreate(intent.getBundleExtra(INTENT_KEY_PORTLET_DATA));
+                portlet.onCreate(intent.getBundleExtra(INTENT_KEY_DATA));
                 portlet.setPortalManager(this);
             }
         }
@@ -363,8 +362,8 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
     public static <T extends Portal, S extends PortalManager> void openPortal(Context context, Class<T> portalType, Bundle portalData, Class<S> managerType) {
         Intent intent = new Intent(context, managerType);
         intent.putExtra(INTENT_KEY_INTENT_TYPE, INTENT_TYPE_OPEN_PORTAL);
-        intent.putExtra(INTENT_KEY_PORTAL_CLASS, portalType.getName());
-        intent.putExtra(INTENT_KEY_PORTAL_DATA, portalData);
+        intent.putExtra(INTENT_KEY_CLASS, portalType.getName());
+        intent.putExtra(INTENT_KEY_DATA, portalData);
         context.startService(intent);
     }
 
@@ -405,8 +404,8 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
     public static <T extends Portlet, S extends PortalManager> void openPortlet(Context context, Class<T> portletType, int portletId, Bundle portletData, Class<S> managerType) {
         Intent intent = new Intent(context, managerType);
         intent.putExtra(INTENT_KEY_INTENT_TYPE, INTENT_TYPE_OPEN_PORTLET);
-        intent.putExtra(INTENT_KEY_PORTLET_CLASS, portletType.getName());
-        intent.putExtra(INTENT_KEY_PORTLET_DATA, portletData);
+        intent.putExtra(INTENT_KEY_CLASS, portletType.getName());
+        intent.putExtra(INTENT_KEY_DATA, portletData);
         intent.putExtra(INTENT_KEY_PORTLET_ID, portletId);
         context.startService(intent);
     }
@@ -468,5 +467,23 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
                 hidePortal();
                 break;
         }
+    }
+
+    public static void close(Context context) {
+        close(context, PortalManager.class);
+    }
+
+    public static <S extends PortalManager> void close(Context context, Class<S> type) {
+        Intent intent = new Intent(context, type);
+        intent.putExtra(PortalManager.INTENT_KEY_INTENT_TYPE, PortalManager.INTENT_TYPE_CLOSE_MANAGER);
+        context.startService(intent);
+    }
+
+    @IntDef({INTENT_TYPE_NO_TYPE, INTENT_TYPE_OPEN_PORTAL, INTENT_TYPE_SHOW_PORTAL,
+            INTENT_TYPE_HIDE_PORTAL, INTENT_TYPE_CLOSE_PORTAL, INTENT_TYPE_OPEN_PORTLET,
+            INTENT_TYPE_SHOW_PORTLET, INTENT_TYPE_HIDE_PORTLET, INTENT_TYPE_CLOSE_PORTLET,
+            INTENT_TYPE_CLOSE_MANAGER
+    })
+    public @interface PM_INTENT_ID {
     }
 }

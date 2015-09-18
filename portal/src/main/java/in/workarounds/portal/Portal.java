@@ -78,4 +78,12 @@ public class Portal extends AbstractPortal {
         return mPortalManager.getPortlet(portletId);
     }
 
+    protected void closeAll() {
+        mPortalManager.stopSelf();
+    }
+
+    public static PortalBuilder with(Context context) {
+        return new PortalBuilder(context);
+    }
+
 }
