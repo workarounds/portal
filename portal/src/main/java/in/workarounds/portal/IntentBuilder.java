@@ -7,7 +7,7 @@ import android.os.Bundle;
 /**
  * Created by madki on 18/09/15.
  */
-public abstract class IntentBuilder {
+public abstract class IntentBuilder<T extends IntentBuilder> {
     private static final String TAG = "IntentBuilder";
     protected Context context;
     protected @PortalManager.PM_INTENT_ID int intentType;
@@ -19,20 +19,11 @@ public abstract class IntentBuilder {
         this.context = context;
     }
 
-    public IntentBuilder data(Bundle data) {
-        this.data = data;
-        return this;
-    }
+    public abstract T data(Bundle data);
 
-    public <S extends PortalManager> IntentBuilder manager(Class<S> managerType) {
-        this.manager = managerType;
-        return this;
-    }
+    public abstract  <S extends PortalManager> T manager(Class<S> managerType);
 
-    protected IntentBuilder intentType(@PortalManager.PM_INTENT_ID int intentType) {
-        this.intentType = intentType;
-        return this;
-    }
+    protected abstract T intentType(@PortalManager.PM_INTENT_ID int intentType);
 
     public abstract void open();
     public abstract void show();
@@ -41,14 +32,19 @@ public abstract class IntentBuilder {
 
 
     protected Intent intent() {
-        if(type == null) {
+        if(requireType() && type == null) {
             throw new IllegalArgumentException("Must provide a type to build Portal/Portlet");
         }
         if(manager == null) {
             manager = PortalManager.class;
         }
+        if(data == null) {
+            data = new Bundle();
+        }
         Intent intent = new Intent(context, manager);
-        intent.putExtra(PortalManager.INTENT_KEY_CLASS, type.getName());
+        if(requireType()) {
+            intent.putExtra(PortalManager.INTENT_KEY_CLASS, type.getName());
+        }
         intent.putExtra(PortalManager.INTENT_KEY_DATA, data);
         intent.putExtra(PortalManager.INTENT_KEY_INTENT_TYPE, intentType);
         return intent;
@@ -57,4 +53,10 @@ public abstract class IntentBuilder {
     protected void build() {
         context.startService(intent());
     }
+
+    protected boolean requireType() {
+        return (intentType == PortalManager.INTENT_TYPE_OPEN_PORTAL
+                | intentType == PortalManager.INTENT_TYPE_OPEN_PORTLET);
+    }
+
 }

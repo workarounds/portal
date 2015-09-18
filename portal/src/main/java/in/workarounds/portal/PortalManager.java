@@ -3,7 +3,6 @@ package in.workarounds.portal;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
@@ -353,104 +352,6 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
     @Nullable
     protected Portlet constructPortlet(String className, int portletId) {
         return constructPortlet(getPortletConstructor(getTypeFromName(className)), portletId);
-    }
-
-    public static <T extends Portal> void openPortal(Context context, Class<T> portalType, Bundle portalData) {
-        openPortal(context, portalType, portalData, PortalManager.class);
-    }
-
-    public static <T extends Portal, S extends PortalManager> void openPortal(Context context, Class<T> portalType, Bundle portalData, Class<S> managerType) {
-        Intent intent = new Intent(context, managerType);
-        intent.putExtra(INTENT_KEY_INTENT_TYPE, INTENT_TYPE_OPEN_PORTAL);
-        intent.putExtra(INTENT_KEY_CLASS, portalType.getName());
-        intent.putExtra(INTENT_KEY_DATA, portalData);
-        context.startService(intent);
-    }
-
-    public static <S extends PortalManager> void showPortal(Context context, Class<S> managerType) {
-        Intent intent = new Intent(context, managerType);
-        intent.putExtra(INTENT_KEY_INTENT_TYPE, INTENT_TYPE_SHOW_PORTAL);
-        context.startService(intent);
-    }
-
-    public static <S extends PortalManager> void hidePortal(Context context, Class<S> managerType) {
-        Intent intent = new Intent(context, managerType);
-        intent.putExtra(INTENT_KEY_INTENT_TYPE, INTENT_TYPE_HIDE_PORTAL);
-        context.startService(intent);
-    }
-
-    public static <S extends PortalManager> void closePortal(Context context, Class<S> managerType) {
-        Intent intent = new Intent(context, managerType);
-        intent.putExtra(INTENT_KEY_INTENT_TYPE, INTENT_TYPE_CLOSE_PORTAL);
-        context.startService(intent);
-    }
-
-    public static void showPortal(Context context) {
-        showPortal(context, PortalManager.class);
-    }
-
-    public static void hidePortal(Context context) {
-        hidePortal(context, PortalManager.class);
-    }
-
-    public static void closePortal(Context context) {
-        closePortal(context, PortalManager.class);
-    }
-
-    public static <T extends Portlet> void openPortlet(Context context, Class<T> portletType, int portletId, Bundle portletData) {
-        openPortlet(context, portletType, portletId, portletData, PortalManager.class);
-    }
-
-    public static <T extends Portlet, S extends PortalManager> void openPortlet(Context context, Class<T> portletType, int portletId, Bundle portletData, Class<S> managerType) {
-        Intent intent = new Intent(context, managerType);
-        intent.putExtra(INTENT_KEY_INTENT_TYPE, INTENT_TYPE_OPEN_PORTLET);
-        intent.putExtra(INTENT_KEY_CLASS, portletType.getName());
-        intent.putExtra(INTENT_KEY_DATA, portletData);
-        intent.putExtra(INTENT_KEY_PORTLET_ID, portletId);
-        context.startService(intent);
-    }
-
-    public static <S extends PortalManager> void showPortlet(Context context, int portletId, Class<S> managerType) {
-        Intent intent = new Intent(context, managerType);
-        intent.putExtra(INTENT_KEY_INTENT_TYPE, INTENT_TYPE_SHOW_PORTLET);
-        intent.putExtra(INTENT_KEY_PORTLET_ID, portletId);
-        context.startService(intent);
-    }
-
-    public static <S extends PortalManager> void hidePortlet(Context context, int portletId, Class<S> managerType) {
-        Intent intent = new Intent(context, managerType);
-        intent.putExtra(INTENT_KEY_INTENT_TYPE, INTENT_TYPE_HIDE_PORTLET);
-        intent.putExtra(INTENT_KEY_PORTLET_ID, portletId);
-        context.startService(intent);
-    }
-
-    public static <S extends PortalManager> void closePortlet(Context context, int portletId, Class<S> managerType) {
-        Intent intent = new Intent(context, managerType);
-        intent.putExtra(INTENT_KEY_INTENT_TYPE, INTENT_TYPE_CLOSE_PORTLET);
-        intent.putExtra(INTENT_KEY_PORTLET_ID, portletId);
-        context.startService(intent);
-    }
-
-    public static void showPortlet(Context context, int portletId) {
-        showPortlet(context, portletId, PortalManager.class);
-    }
-
-    public static void hidePortlet(Context context, int portletId) {
-        hidePortlet(context, portletId, PortalManager.class);
-    }
-
-    public static void closePortlet(Context context, int portletId) {
-        closePortlet(context, portletId, PortalManager.class);
-    }
-
-    public static <S extends PortalManager> void closeManager(Context context, Class<S> managerType) {
-        Intent intent = new Intent(context, managerType);
-        intent.putExtra(INTENT_KEY_INTENT_TYPE, INTENT_TYPE_CLOSE_MANAGER);
-        context.startService(intent);
-    }
-
-    public static void closeManager(Context context) {
-        closeManager(context, PortalManager.class);
     }
 
     @Override

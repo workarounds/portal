@@ -1,11 +1,12 @@
 package in.workarounds.samples.portal;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 
+import in.workarounds.portal.Portal;
 import in.workarounds.portal.PortalManager;
+import in.workarounds.portal.Portlet;
 
 /**
  * Created by madki on 17/09/15.
@@ -30,31 +31,31 @@ public class ButtonListener implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_open_portal:
-                PortalManager.openPortal(context, TestPortal.class, new Bundle());
+                Portal.with(context).type(TestPortal.class).open();
                 break;
             case R.id.btn_show_portal:
-                PortalManager.showPortal(context);
+                Portal.with(context).show();
                 break;
             case R.id.btn_hide_portal:
-                PortalManager.hidePortal(context);
+                Portal.with(context).hide();
                 break;
             case R.id.btn_close_portal:
-                PortalManager.closePortal(context);
+                Portal.with(context).close();
                 break;
             case R.id.btn_open_portlet:
-                PortalManager.openPortlet(context, TestPortlet.class, getIdFromET(), new Bundle());
+                Portlet.with(context).id(getIdFromET()).type(TestPortlet.class).open();
                 break;
             case R.id.btn_show_portlet:
-                PortalManager.showPortlet(context, getIdFromET());
+                Portlet.with(context).id(getIdFromET()).show();
                 break;
             case R.id.btn_hide_portlet:
-                PortalManager.hidePortlet(context, getIdFromET());
+                Portlet.with(context).id(getIdFromET()).hide();
                 break;
             case R.id.btn_close_portlet:
-                PortalManager.closePortlet(context, getIdFromET());
+                Portlet.with(context).id(getIdFromET()).close();
                 break;
             case R.id.btn_close_service:
-                PortalManager.closeManager(context);
+                PortalManager.close(context);
                 break;
         }
     }

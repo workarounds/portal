@@ -27,21 +27,25 @@ public class Portlet extends AbstractPortal {
     @NonNull
     @Override
     protected WindowManager.LayoutParams getLayoutParams() {
-        WindowManager.LayoutParams params = new WindowManager.LayoutParams();
-        params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
-        params.flags = params.flags | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-                | WindowManager.LayoutParams.FLAG_SPLIT_TOUCH;
-        params.format = PixelFormat.TRANSLUCENT;
+        if(mView.getLayoutParams() instanceof WindowManager.LayoutParams) {
+            return (WindowManager.LayoutParams) mView.getLayoutParams();
+        } else {
+            WindowManager.LayoutParams params = new WindowManager.LayoutParams();
+            params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
+            params.flags = params.flags | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                    | WindowManager.LayoutParams.FLAG_SPLIT_TOUCH;
+            params.format = PixelFormat.TRANSLUCENT;
 
-        FrameLayout.LayoutParams viewParams = (FrameLayout.LayoutParams) mView.getLayoutParams();
+            FrameLayout.LayoutParams viewParams = (FrameLayout.LayoutParams) mView.getLayoutParams();
 
-        ParamUtils.transferMarginAndGravity(params, viewParams);
-        return params;
+            ParamUtils.transferMarginAndGravity(params, viewParams);
+            return params;
+        }
     }
 
     @Override
     public void finish() {
-        PortalManager.closePortlet(this, getId(), mPortalManager.getClass());
+        Portlet.with(this).id(getId()).manager(mPortalManager.getClass()).close();
     }
 
     public void setPortalManager(PortalManager portalManager) {

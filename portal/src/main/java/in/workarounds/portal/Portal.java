@@ -36,24 +36,28 @@ public class Portal extends AbstractPortal {
     @NonNull
     @Override
     protected WindowManager.LayoutParams getLayoutParams() {
-        WindowManager.LayoutParams params = new WindowManager.LayoutParams();
-        params.type = WindowManager.LayoutParams.TYPE_PRIORITY_PHONE;
-        params.flags = params.flags | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
-        params.format = PixelFormat.TRANSLUCENT;
-
-        if (!mRootAdded) {
-            FrameLayout.LayoutParams viewParams = (FrameLayout.LayoutParams) mView.getLayoutParams();
-            ParamUtils.transferMarginAndGravity(params, viewParams);
+        if(mView.getLayoutParams() instanceof WindowManager.LayoutParams) {
+            return (WindowManager.LayoutParams) mView.getLayoutParams();
         } else {
-            params.gravity = Gravity.TOP;
-        }
+            WindowManager.LayoutParams params = new WindowManager.LayoutParams();
+            params.type = WindowManager.LayoutParams.TYPE_PRIORITY_PHONE;
+            params.flags = params.flags | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
+            params.format = PixelFormat.TRANSLUCENT;
 
-        return params;
+            if (!mRootAdded) {
+                FrameLayout.LayoutParams viewParams = (FrameLayout.LayoutParams) mView.getLayoutParams();
+                ParamUtils.transferMarginAndGravity(params, viewParams);
+            } else {
+                params.gravity = Gravity.TOP;
+            }
+
+            return params;
+        }
     }
 
     @Override
     public void finish() {
-        PortalManager.closePortal(this, mPortalManager.getClass());
+        Portal.with(this).manager(mPortalManager.getClass()).close();
     }
 
     public boolean onBackPressed() {
