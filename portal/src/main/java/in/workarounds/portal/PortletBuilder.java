@@ -48,6 +48,9 @@ public class PortletBuilder extends IntentBuilder<PortletBuilder> {
     @Override
     protected Intent intent() {
         Intent intent = super.intent();
+        if(!Portlet.isValidID(id)) {
+            throw new IllegalArgumentException("Portlet id invalid");
+        }
         intent.putExtra(PortalManager.INTENT_KEY_PORTLET_ID, id);
         return intent;
     }
@@ -70,5 +73,10 @@ public class PortletBuilder extends IntentBuilder<PortletBuilder> {
     @Override
     public void close() {
         this.intentType(PortalManager.INTENT_TYPE_CLOSE_PORTLET).build();
+    }
+
+    @Override
+    public void send() {
+        this.intentType(PortalManager.INTENT_TYPE_PORTLET_DATA).build();
     }
 }

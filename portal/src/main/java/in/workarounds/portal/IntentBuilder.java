@@ -29,6 +29,7 @@ public abstract class IntentBuilder<T extends IntentBuilder> {
     public abstract void show();
     public abstract void hide();
     public abstract void close();
+    public abstract void send();
 
 
     protected Intent intent() {

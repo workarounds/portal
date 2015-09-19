@@ -68,6 +68,10 @@ public abstract class AbstractPortal extends ContextWrapper {
 
     }
 
+    protected void onData(Bundle data) {
+
+    }
+
     protected void onResume() {
         mState = STATE_ACTIVE;
     }

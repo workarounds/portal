@@ -54,4 +54,9 @@ public class PortalBuilder extends IntentBuilder<PortalBuilder> {
     public void close() {
         this.intentType(PortalManager.INTENT_TYPE_CLOSE_PORTAL).build();
     }
+
+    @Override
+    public void send() {
+        this.intentType(PortalManager.INTENT_TYPE_PORTAL_DATA).build();
+    }
 }
