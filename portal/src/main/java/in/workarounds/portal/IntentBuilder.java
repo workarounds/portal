@@ -51,7 +51,7 @@ public abstract class IntentBuilder<T extends IntentBuilder> {
         return intent;
     }
 
-    protected void build() {
+    protected void start() {
         context.startService(intent());
     }
 

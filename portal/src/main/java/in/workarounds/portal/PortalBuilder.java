@@ -37,26 +37,26 @@ public class PortalBuilder extends IntentBuilder<PortalBuilder> {
 
     @Override
     public void open() {
-        this.intentType(PortalManager.INTENT_TYPE_OPEN_PORTAL).build();
+        this.intentType(PortalManager.INTENT_TYPE_OPEN_PORTAL).start();
     }
 
     @Override
     public void show() {
-        this.intentType(PortalManager.INTENT_TYPE_SHOW_PORTAL).build();
+        this.intentType(PortalManager.INTENT_TYPE_SHOW_PORTAL).start();
     }
 
     @Override
     public void hide() {
-        this.intentType(PortalManager.INTENT_TYPE_HIDE_PORTAL).build();
+        this.intentType(PortalManager.INTENT_TYPE_HIDE_PORTAL).start();
     }
 
     @Override
     public void close() {
-        this.intentType(PortalManager.INTENT_TYPE_CLOSE_PORTAL).build();
+        this.intentType(PortalManager.INTENT_TYPE_CLOSE_PORTAL).start();
     }
 
     @Override
     public void send() {
-        this.intentType(PortalManager.INTENT_TYPE_PORTAL_DATA).build();
+        this.intentType(PortalManager.INTENT_TYPE_PORTAL_DATA).start();
     }
 }

@@ -57,26 +57,26 @@ public class PortletBuilder extends IntentBuilder<PortletBuilder> {
 
     @Override
     public void open() {
-        this.intentType(PortalManager.INTENT_TYPE_OPEN_PORTLET).build();
+        this.intentType(PortalManager.INTENT_TYPE_OPEN_PORTLET).start();
     }
 
     @Override
     public void show() {
-        this.intentType(PortalManager.INTENT_TYPE_SHOW_PORTLET).build();
+        this.intentType(PortalManager.INTENT_TYPE_SHOW_PORTLET).start();
     }
 
     @Override
     public void hide() {
-        this.intentType(PortalManager.INTENT_TYPE_HIDE_PORTLET).build();
+        this.intentType(PortalManager.INTENT_TYPE_HIDE_PORTLET).start();
     }
 
     @Override
     public void close() {
-        this.intentType(PortalManager.INTENT_TYPE_CLOSE_PORTLET).build();
+        this.intentType(PortalManager.INTENT_TYPE_CLOSE_PORTLET).start();
     }
 
     @Override
     public void send() {
-        this.intentType(PortalManager.INTENT_TYPE_PORTLET_DATA).build();
+        this.intentType(PortalManager.INTENT_TYPE_PORTLET_DATA).start();
     }
 }
