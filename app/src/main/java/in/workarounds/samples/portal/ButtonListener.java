@@ -34,7 +34,7 @@ public class ButtonListener implements View.OnClickListener {
         bundle.putString("key", "hi");
         switch (v.getId()) {
             case R.id.btn_open_portal:
-                Portal.with(context).type(TestPortal.class).open();
+                Portal.with(context).open(TestPortal.class);
                 break;
             case R.id.btn_show_portal:
                 Portal.with(context).show();
@@ -46,9 +46,9 @@ public class ButtonListener implements View.OnClickListener {
                 Portal.with(context).close();
                 break;
             case R.id.btn_send_portal:
-                Portal.with(context).type(TestPortal.class).data(bundle).send();
+                Portal.with(context).data(bundle).send(TestPortal.class);
             case R.id.btn_open_portlet:
-                Portlet.with(context).id(getIdFromET()).type(TestPortlet.class).open();
+                Portlet.with(context).id(getIdFromET()).open(TestPortlet.class);
                 break;
             case R.id.btn_show_portlet:
                 Portlet.with(context).id(getIdFromET()).show();
@@ -60,7 +60,7 @@ public class ButtonListener implements View.OnClickListener {
                 Portlet.with(context).id(getIdFromET()).close();
                 break;
             case R.id.btn_send_portlet:
-                Portlet.with(context).type(TestPortlet.class).id(getIdFromET()).data(bundle).send();
+                Portlet.with(context).id(getIdFromET()).data(bundle).send(TestPortlet.class);
             case R.id.btn_close_service:
                 PortalManager.close(context);
                 break;

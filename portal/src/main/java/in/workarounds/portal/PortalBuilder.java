@@ -36,7 +36,8 @@ public class PortalBuilder extends IntentBuilder<PortalBuilder> {
     }
 
     @Override
-    public void open() {
+    public void open(Class<? extends AbstractPortal> type) {
+        this.type = type;
         this.intentType(PortalManager.INTENT_TYPE_OPEN_PORTAL).start();
     }
 
@@ -56,7 +57,8 @@ public class PortalBuilder extends IntentBuilder<PortalBuilder> {
     }
 
     @Override
-    public void send() {
+    public void send(Class<? extends AbstractPortal> type) {
+        this.type = type;
         this.intentType(PortalManager.INTENT_TYPE_PORTAL_DATA).start();
     }
 }

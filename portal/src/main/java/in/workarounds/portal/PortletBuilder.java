@@ -56,7 +56,8 @@ public class PortletBuilder extends IntentBuilder<PortletBuilder> {
     }
 
     @Override
-    public void open() {
+    public void open(Class<? extends AbstractPortal> type) {
+        this.type = type;
         this.intentType(PortalManager.INTENT_TYPE_OPEN_PORTLET).start();
     }
 
@@ -76,7 +77,8 @@ public class PortletBuilder extends IntentBuilder<PortletBuilder> {
     }
 
     @Override
-    public void send() {
+    public void send(Class<? extends AbstractPortal> type) {
+        this.type = type;
         this.intentType(PortalManager.INTENT_TYPE_PORTLET_DATA).start();
     }
 }

@@ -25,11 +25,11 @@ public abstract class IntentBuilder<T extends IntentBuilder> {
 
     protected abstract T intentType(@PortalManager.PM_INTENT_ID int intentType);
 
-    public abstract void open();
+    public abstract void open(Class<? extends AbstractPortal> type);
     public abstract void show();
     public abstract void hide();
     public abstract void close();
-    public abstract void send();
+    public abstract void send(Class<? extends AbstractPortal> type);
 
 
     public Intent intent() {
