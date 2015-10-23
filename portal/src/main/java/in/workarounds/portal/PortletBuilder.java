@@ -46,7 +46,7 @@ public class PortletBuilder extends IntentBuilder<PortletBuilder> {
     }
 
     @Override
-    protected Intent intent() {
+    public Intent intent() {
         Intent intent = super.intent();
         if(!Portlet.isValidID(id)) {
             throw new IllegalArgumentException("Portlet id invalid");

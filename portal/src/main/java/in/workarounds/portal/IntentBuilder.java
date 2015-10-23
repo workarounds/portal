@@ -32,7 +32,7 @@ public abstract class IntentBuilder<T extends IntentBuilder> {
     public abstract void send();
 
 
-    protected Intent intent() {
+    public Intent intent() {
         if(requireType() && type == null) {
             throw new IllegalArgumentException("Must provide a type to build Portal/Portlet");
         }
@@ -57,7 +57,10 @@ public abstract class IntentBuilder<T extends IntentBuilder> {
 
     protected boolean requireType() {
         return (intentType == PortalManager.INTENT_TYPE_OPEN_PORTAL
-                | intentType == PortalManager.INTENT_TYPE_OPEN_PORTLET);
+                || intentType == PortalManager.INTENT_TYPE_OPEN_PORTLET
+                || intentType == PortalManager.INTENT_TYPE_PORTAL_DATA
+                || intentType == PortalManager.INTENT_TYPE_PORTLET_DATA
+        );
     }
 
 }
