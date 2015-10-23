@@ -19,6 +19,8 @@ public class MainActivity extends AppCompatActivity {
     Button hideButton;
     @Bind(R.id.btn_close_portal)
     Button closeButton;
+    @Bind(R.id.btn_send_portal)
+    Button sendButton;
     @Bind(R.id.et_portlet_id)
     EditText editText;
     @Bind(R.id.btn_open_portlet)
@@ -29,6 +31,10 @@ public class MainActivity extends AppCompatActivity {
     Button hideButtonPortlet;
     @Bind(R.id.btn_close_portlet)
     Button closeButtonPortlet;
+    @Bind(R.id.btn_send_portlet)
+    Button sendButtonPortlet;
+    @Bind(R.id.btn_send_to_all)
+    Button sendToAllButton;
     @Bind(R.id.btn_close_service)
     Button closeServiceButton;
 
@@ -44,10 +50,13 @@ public class MainActivity extends AppCompatActivity {
         showButton.setOnClickListener(listener);
         hideButton.setOnClickListener(listener);
         closeButton.setOnClickListener(listener);
+        sendButton.setOnClickListener(listener);
         openButtonPortlet.setOnClickListener(listener);
         showButtonPortlet.setOnClickListener(listener);
         hideButtonPortlet.setOnClickListener(listener);
         closeButtonPortlet.setOnClickListener(listener);
+        sendButtonPortlet.setOnClickListener(listener);
+        sendToAllButton.setOnClickListener(listener);
         closeServiceButton.setOnClickListener(listener);
     }
 

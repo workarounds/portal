@@ -1,6 +1,7 @@
 package in.workarounds.samples.portal;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 
@@ -29,6 +30,8 @@ public class ButtonListener implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
+        Bundle bundle = new Bundle();
+        bundle.putString("key", "hi");
         switch (v.getId()) {
             case R.id.btn_open_portal:
                 Portal.with(context).type(TestPortal.class).open();
@@ -42,6 +45,8 @@ public class ButtonListener implements View.OnClickListener {
             case R.id.btn_close_portal:
                 Portal.with(context).close();
                 break;
+            case R.id.btn_send_portal:
+                Portal.with(context).type(TestPortal.class).data(bundle).send();
             case R.id.btn_open_portlet:
                 Portlet.with(context).id(getIdFromET()).type(TestPortlet.class).open();
                 break;
@@ -54,9 +59,13 @@ public class ButtonListener implements View.OnClickListener {
             case R.id.btn_close_portlet:
                 Portlet.with(context).id(getIdFromET()).close();
                 break;
+            case R.id.btn_send_portlet:
+                Portlet.with(context).type(TestPortlet.class).id(getIdFromET()).data(bundle).send();
             case R.id.btn_close_service:
                 PortalManager.close(context);
                 break;
+            case R.id.btn_send_to_all:
+                PortalManager.send(context, bundle);
         }
     }
 }
