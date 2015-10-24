@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.Toast;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -61,5 +62,11 @@ public class TestPortal extends Portal {
     protected void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy called");
+    }
+
+    @Override
+    protected void onData(Bundle data) {
+        super.onData(data);
+        Toast.makeText(this, data.getString("key"), Toast.LENGTH_LONG).show();
     }
 }

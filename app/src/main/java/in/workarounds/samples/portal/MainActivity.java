@@ -4,51 +4,25 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
+import android.view.View;
 import android.widget.EditText;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity {
-    @Bind(R.id.btn_open_portal)
-    Button openButton;
-    @Bind(R.id.btn_show_portal)
-    Button showButton;
-    @Bind(R.id.btn_hide_portal)
-    Button hideButton;
-    @Bind(R.id.btn_close_portal)
-    Button closeButton;
     @Bind(R.id.et_portlet_id)
     EditText editText;
-    @Bind(R.id.btn_open_portlet)
-    Button openButtonPortlet;
-    @Bind(R.id.btn_show_portlet)
-    Button showButtonPortlet;
-    @Bind(R.id.btn_hide_portlet)
-    Button hideButtonPortlet;
-    @Bind(R.id.btn_close_portlet)
-    Button closeButtonPortlet;
-    @Bind(R.id.btn_close_service)
-    Button closeServiceButton;
 
+    ButtonListener listener;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        ButtonListener listener = new ButtonListener(this);
+        listener = new ButtonListener(this);
         listener.setEditText(editText);
-
-        openButton.setOnClickListener(listener);
-        showButton.setOnClickListener(listener);
-        hideButton.setOnClickListener(listener);
-        closeButton.setOnClickListener(listener);
-        openButtonPortlet.setOnClickListener(listener);
-        showButtonPortlet.setOnClickListener(listener);
-        hideButtonPortlet.setOnClickListener(listener);
-        closeButtonPortlet.setOnClickListener(listener);
-        closeServiceButton.setOnClickListener(listener);
     }
 
     @Override
@@ -73,4 +47,22 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @OnClick({
+            R.id.btn_open_portal,
+            R.id.btn_show_portal,
+            R.id.btn_hide_portal,
+            R.id.btn_close_portal,
+            R.id.btn_send_portal,
+            R.id.btn_send_if_portal_open,
+            R.id.btn_open_portlet,
+            R.id.btn_show_portlet,
+            R.id.btn_hide_portlet,
+            R.id.btn_close_portlet,
+            R.id.btn_send_portlet,
+            R.id.btn_send_to_all,
+            R.id.btn_close_service
+    })
+    public void onButtonClicked(View v){
+        listener.onClick(v);
+    }
 }

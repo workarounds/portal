@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -26,6 +27,7 @@ public class TestPortlet extends Portlet {
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         setContentView(R.layout.portlet_test);
+        Toast.makeText(this, bundle.getString("key"), Toast.LENGTH_LONG).show();
         ButterKnife.bind(this, getView());
         textView.setText(Integer.toString(getId()));
 
@@ -35,5 +37,11 @@ public class TestPortlet extends Portlet {
                 Log.d(TAG, "Portlet Clicked");
             }
         });
+    }
+
+    @Override
+    protected void onData(Bundle data) {
+        super.onData(data);
+        Toast.makeText(this, data.getString("key"), Toast.LENGTH_LONG).show();
     }
 }

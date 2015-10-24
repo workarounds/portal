@@ -25,14 +25,14 @@ public abstract class IntentBuilder<T extends IntentBuilder> {
 
     protected abstract T intentType(@PortalManager.PM_INTENT_ID int intentType);
 
-    public abstract void open();
+    public abstract void open(Class<? extends AbstractPortal> type);
     public abstract void show();
     public abstract void hide();
     public abstract void close();
-    public abstract void send();
+    public abstract void send(Class<? extends AbstractPortal> type);
 
 
-    protected Intent intent() {
+    public Intent intent() {
         if(requireType() && type == null) {
             throw new IllegalArgumentException("Must provide a type to build Portal/Portlet");
         }
@@ -51,13 +51,16 @@ public abstract class IntentBuilder<T extends IntentBuilder> {
         return intent;
     }
 
-    protected void build() {
+    protected void start() {
         context.startService(intent());
     }
 
     protected boolean requireType() {
         return (intentType == PortalManager.INTENT_TYPE_OPEN_PORTAL
-                | intentType == PortalManager.INTENT_TYPE_OPEN_PORTLET);
+                || intentType == PortalManager.INTENT_TYPE_OPEN_PORTLET
+                || intentType == PortalManager.INTENT_TYPE_PORTAL_DATA
+                || intentType == PortalManager.INTENT_TYPE_PORTLET_DATA
+        );
     }
 
 }

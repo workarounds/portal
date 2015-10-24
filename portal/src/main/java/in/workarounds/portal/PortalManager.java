@@ -84,6 +84,8 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
         for (int i : keys) {
             closePortlet(i);
         }
+        PortalState.getInstance(this).clear();
+        PortletState.getInstance(this).clear();
     }
 
     protected void resolveIntent(int intentType, @NonNull Intent intent) {
@@ -118,13 +120,13 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
                 closeManager();
                 break;
             case INTENT_TYPE_PORTAL_DATA:
-                sendDataToPortal(intent.getBundleExtra(INTENT_KEY_DATA));
+                sendDataToPortal(intent);
                 break;
             case INTENT_TYPE_PORTLET_DATA:
-                sendDataToPortlet(intent.getBundleExtra(INTENT_KEY_DATA), intent.getIntExtra(INTENT_KEY_PORTLET_ID, -1));
+                sendDataToPortlet(intent, intent.getIntExtra(INTENT_KEY_PORTLET_ID, -1));
                 break;
             case INTENT_TYPE_DATA_TO_ALL:
-                sendData(intent.getBundleExtra(INTENT_KEY_DATA));
+                sendData(intent);
                 break;
             case INTENT_TYPE_NO_TYPE:
                 break;
@@ -242,23 +244,29 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
         }
     }
 
-    protected void sendData(Bundle data) {
-        sendDataToPortal(data);
+    protected void sendData(Intent intent) {
+        if(mPortal != null){
+            sendDataToPortal(intent);
+        }
         for (int id: mPortlets.keySet()) {
-            sendDataToPortlet(data, id);
+            sendDataToPortlet(intent, id);
         }
     }
 
-    protected void sendDataToPortal(Bundle data) {
+    protected void sendDataToPortal(Intent intent) {
         if(mPortal != null) {
-            mPortal.onData(data);
+            mPortal.onData(intent.getBundleExtra(INTENT_KEY_DATA));
+        } else {
+            openPortal(intent);
         }
     }
 
-    protected void sendDataToPortlet(Bundle data, int id) {
+    protected void sendDataToPortlet(Intent intent, int id) {
         Portlet portlet = getPortlet(id);
         if(portlet != null) {
-            portlet.onData(data);
+            portlet.onData(intent.getBundleExtra(INTENT_KEY_DATA));
+        } else {
+            openPortlet(intent);
         }
     }
 
@@ -424,6 +432,14 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
         intent.putExtra(PortalManager.INTENT_KEY_INTENT_TYPE, PortalManager.INTENT_TYPE_DATA_TO_ALL);
         intent.putExtra(PortalManager.INTENT_KEY_DATA, data);
         context.startService(intent);
+    }
+
+    public static @State.STATE int getPortalState(Context context, Class<? extends Portal> type){
+        return PortalState.getInstance(context).getState(type);
+    }
+
+    public static @State.STATE int getPortletState(Context context, int id){
+        return PortletState.getInstance(context).getState(id);
     }
 
     private void checkForTermination() {

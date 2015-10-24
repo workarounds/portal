@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.0"
+    buildToolsVersion "23.0.1"
 
     defaultConfig {
         minSdkVersion 11
@@ -32,7 +32,7 @@ ext {
     siteUrl = 'https://github.com/workarounds/portal'
     gitUrl = 'https://github.com/workarounds/portal.git'
 
-    libraryVersion = '0.0.3'
+    libraryVersion = '0.0.4'
 
     developerId = 'workarounds'
     developerName = 'Workarounds'
@@ -46,7 +46,7 @@ ext {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:23.0.1'
+    compile 'com.android.support:appcompat-v7:23.1.0'
 }
 
 apply from: 'https://gist.githubusercontent.com/themadhukiran/6fb1b85f8be3d2bba733/raw/33bbbd3fbc103276cbb48d4a6e3c5e4d12e5f555/installv1.gradle'
