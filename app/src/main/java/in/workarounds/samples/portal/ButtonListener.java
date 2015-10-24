@@ -8,6 +8,7 @@ import android.widget.EditText;
 import in.workarounds.portal.Portal;
 import in.workarounds.portal.PortalManager;
 import in.workarounds.portal.Portlet;
+import in.workarounds.portal.State;
 
 /**
  * Created by madki on 17/09/15.
@@ -47,6 +48,13 @@ public class ButtonListener implements View.OnClickListener {
                 break;
             case R.id.btn_send_portal:
                 Portal.with(context).data(bundle).send(TestPortal.class);
+                break;
+            case R.id.btn_send_if_portal_open:
+                int state = PortalManager.getPortalState(context, TestPortal.class);
+                if(state != State.CLOSED){
+                    Portal.with(context).data(bundle).send(TestPortal.class);
+                }
+                break;
             case R.id.btn_open_portlet:
                 Portlet.with(context).id(getIdFromET()).open(TestPortlet.class);
                 break;

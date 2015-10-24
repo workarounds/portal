@@ -42,6 +42,12 @@
             android:layout_height="wrap_content"
             android:text="Send Portal" />
 
+        <Button
+            android:id="@+id/btn_send_if_portal_open"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Send if portal open" />
+
         <EditText
             android:id="@+id/et_portlet_id"
             android:layout_width="wrap_content"
