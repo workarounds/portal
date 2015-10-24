@@ -84,6 +84,8 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
         for (int i : keys) {
             closePortlet(i);
         }
+        PortalState.getInstance(this).clear();
+        PortletState.getInstance(this).clear();
     }
 
     protected void resolveIntent(int intentType, @NonNull Intent intent) {
@@ -430,6 +432,14 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
         intent.putExtra(PortalManager.INTENT_KEY_INTENT_TYPE, PortalManager.INTENT_TYPE_DATA_TO_ALL);
         intent.putExtra(PortalManager.INTENT_KEY_DATA, data);
         context.startService(intent);
+    }
+
+    public static @State.STATE int getPortalState(Context context, Class<? extends Portal> type){
+        return PortalState.getInstance(context).getState(type);
+    }
+
+    public static @State.STATE int getPortletState(Context context, int id){
+        return PortletState.getInstance(context).getState(id);
     }
 
     private void checkForTermination() {
