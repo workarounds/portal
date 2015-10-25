@@ -28,7 +28,7 @@ public abstract class AbstractPortal extends ContextWrapper {
     }
 
     protected void setContentView(@LayoutRes int layoutId) {
-        setContentView(LayoutInflater.from(this).inflate(layoutId, new FrameLayout(this), false));
+        setContentView(LayoutInflater.from(this).cloneInContext(this).inflate(layoutId, new FrameLayout(this), false));
     }
 
     protected void setContentView(View view) {
