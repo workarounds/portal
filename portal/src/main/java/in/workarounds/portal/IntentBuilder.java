@@ -25,14 +25,53 @@ public abstract class IntentBuilder<T extends IntentBuilder> {
 
     protected abstract T intentType(@PortalManager.PM_INTENT_ID int intentType);
 
-    public abstract void open(Class<? extends AbstractPortal> type);
-    public abstract void show();
-    public abstract void hide();
-    public abstract void close();
-    public abstract void send(Class<? extends AbstractPortal> type);
+    public void open(Class<? extends AbstractPortal> type) {
+        setOpenType(type).start();
+    }
 
+    public void show() {
+        setShowType().start();
+    }
 
-    public Intent intent() {
+    public void hide() {
+        setHideType().start();
+    }
+
+    public void close() {
+        setCloseType().start();
+    }
+
+    public void send(Class<? extends AbstractPortal> type) {
+        setSendType(type).start();
+    }
+
+    public Intent openIntent(Class<? extends AbstractPortal> type){
+        return setOpenType(type).intent();
+    }
+
+    public Intent showIntent(){
+        return setShowType().intent();
+    }
+
+    public Intent hideIntent(){
+        return setHideType().intent();
+    }
+
+    public Intent closeIntent(){
+        return setCloseType().intent();
+    }
+
+    public Intent sendIntent(Class<? extends AbstractPortal> type){
+        return setSendType(type).intent();
+    }
+
+    protected abstract T setOpenType(Class<? extends  AbstractPortal> type);
+    protected abstract T setShowType();
+    protected abstract T setHideType();
+    protected abstract T setCloseType();
+    protected abstract T setSendType(Class<? extends AbstractPortal> type);
+
+    protected Intent intent() {
         if(requireType() && type == null) {
             throw new IllegalArgumentException("Must provide a type to build Portal/Portlet");
         }
@@ -58,9 +97,8 @@ public abstract class IntentBuilder<T extends IntentBuilder> {
     protected boolean requireType() {
         return (intentType == PortalManager.INTENT_TYPE_OPEN_PORTAL
                 || intentType == PortalManager.INTENT_TYPE_OPEN_PORTLET
-                || intentType == PortalManager.INTENT_TYPE_PORTAL_DATA
-                || intentType == PortalManager.INTENT_TYPE_PORTLET_DATA
+                || intentType == PortalManager.INTENT_TYPE_SEND_PORTAL
+                || intentType == PortalManager.INTENT_TYPE_SEND_PORTLET
         );
     }
-
 }

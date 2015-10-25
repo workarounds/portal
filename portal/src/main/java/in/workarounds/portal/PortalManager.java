@@ -33,16 +33,16 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
     protected static final int INTENT_TYPE_CLOSE_PORTAL  = 2;
     protected static final int INTENT_TYPE_HIDE_PORTAL   = 3;
     protected static final int INTENT_TYPE_SHOW_PORTAL   = 4;
-    protected static final int INTENT_TYPE_PORTAL_DATA   = 5;
+    protected static final int INTENT_TYPE_SEND_PORTAL   = 5;
 
     protected static final int INTENT_TYPE_OPEN_PORTLET  = 11;
     protected static final int INTENT_TYPE_CLOSE_PORTLET = 12;
     protected static final int INTENT_TYPE_HIDE_PORTLET  = 13;
     protected static final int INTENT_TYPE_SHOW_PORTLET  = 14;
-    protected static final int INTENT_TYPE_PORTLET_DATA  = 15;
+    protected static final int INTENT_TYPE_SEND_PORTLET  = 15;
 
     protected static final int INTENT_TYPE_CLOSE_MANAGER = 100;
-    protected static final int INTENT_TYPE_DATA_TO_ALL   = 101;
+    protected static final int INTENT_TYPE_SEND_TO_ALL   = 101;
 
     protected static final String INTENT_KEY_CLASS = "intent_key_class";
     protected static final String INTENT_KEY_DATA = "intent_key_data";
@@ -119,13 +119,13 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
             case INTENT_TYPE_CLOSE_MANAGER:
                 closeManager();
                 break;
-            case INTENT_TYPE_PORTAL_DATA:
+            case INTENT_TYPE_SEND_PORTAL:
                 sendDataToPortal(intent);
                 break;
-            case INTENT_TYPE_PORTLET_DATA:
+            case INTENT_TYPE_SEND_PORTLET:
                 sendDataToPortlet(intent, intent.getIntExtra(INTENT_KEY_PORTLET_ID, -1));
                 break;
-            case INTENT_TYPE_DATA_TO_ALL:
+            case INTENT_TYPE_SEND_TO_ALL:
                 sendData(intent);
                 break;
             case INTENT_TYPE_NO_TYPE:
@@ -429,7 +429,7 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
 
     public static <S extends PortalManager> void send(Context context, Bundle data, Class<S> type) {
         Intent intent = new Intent(context, type);
-        intent.putExtra(PortalManager.INTENT_KEY_INTENT_TYPE, PortalManager.INTENT_TYPE_DATA_TO_ALL);
+        intent.putExtra(PortalManager.INTENT_KEY_INTENT_TYPE, PortalManager.INTENT_TYPE_SEND_TO_ALL);
         intent.putExtra(PortalManager.INTENT_KEY_DATA, data);
         context.startService(intent);
     }
@@ -451,7 +451,7 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
     @IntDef({INTENT_TYPE_NO_TYPE, INTENT_TYPE_OPEN_PORTAL, INTENT_TYPE_SHOW_PORTAL,
             INTENT_TYPE_HIDE_PORTAL, INTENT_TYPE_CLOSE_PORTAL, INTENT_TYPE_OPEN_PORTLET,
             INTENT_TYPE_SHOW_PORTLET, INTENT_TYPE_HIDE_PORTLET, INTENT_TYPE_CLOSE_PORTLET,
-            INTENT_TYPE_CLOSE_MANAGER, INTENT_TYPE_PORTLET_DATA, INTENT_TYPE_PORTAL_DATA, INTENT_TYPE_DATA_TO_ALL
+            INTENT_TYPE_CLOSE_MANAGER, INTENT_TYPE_SEND_PORTLET, INTENT_TYPE_SEND_PORTAL, INTENT_TYPE_SEND_TO_ALL
     })
     public @interface PM_INTENT_ID {
     }
