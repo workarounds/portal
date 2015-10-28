@@ -56,29 +56,29 @@ public class PortletBuilder extends IntentBuilder<PortletBuilder> {
     }
 
     @Override
-    public void open(Class<? extends AbstractPortal> type) {
+    protected PortletBuilder setOpenType(Class<? extends AbstractPortal> type){
         this.type = type;
-        this.intentType(PortalManager.INTENT_TYPE_OPEN_PORTLET).start();
+        return intentType(PortalManager.INTENT_TYPE_OPEN_PORTLET);
     }
 
     @Override
-    public void show() {
-        this.intentType(PortalManager.INTENT_TYPE_SHOW_PORTLET).start();
+    protected PortletBuilder setShowType(){
+        return intentType(PortalManager.INTENT_TYPE_SHOW_PORTLET);
     }
 
     @Override
-    public void hide() {
-        this.intentType(PortalManager.INTENT_TYPE_HIDE_PORTLET).start();
+    protected PortletBuilder setHideType(){
+        return intentType(PortalManager.INTENT_TYPE_HIDE_PORTLET);
     }
 
     @Override
-    public void close() {
-        this.intentType(PortalManager.INTENT_TYPE_CLOSE_PORTLET).start();
+    protected PortletBuilder setCloseType(){
+        return intentType(PortalManager.INTENT_TYPE_CLOSE_PORTLET);
     }
 
     @Override
-    public void send(Class<? extends AbstractPortal> type) {
+    protected PortletBuilder setSendType(Class<? extends AbstractPortal> type){
         this.type = type;
-        this.intentType(PortalManager.INTENT_TYPE_PORTLET_DATA).start();
+        return intentType(PortalManager.INTENT_TYPE_SEND_PORTLET);
     }
 }

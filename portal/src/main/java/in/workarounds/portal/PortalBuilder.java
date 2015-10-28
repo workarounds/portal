@@ -36,29 +36,29 @@ public class PortalBuilder extends IntentBuilder<PortalBuilder> {
     }
 
     @Override
-    public void open(Class<? extends AbstractPortal> type) {
+    protected PortalBuilder setOpenType(Class<? extends AbstractPortal> type){
         this.type = type;
-        this.intentType(PortalManager.INTENT_TYPE_OPEN_PORTAL).start();
+        return intentType(PortalManager.INTENT_TYPE_OPEN_PORTAL);
     }
 
     @Override
-    public void show() {
-        this.intentType(PortalManager.INTENT_TYPE_SHOW_PORTAL).start();
+    protected PortalBuilder setShowType(){
+        return intentType(PortalManager.INTENT_TYPE_SHOW_PORTAL);
     }
 
     @Override
-    public void hide() {
-        this.intentType(PortalManager.INTENT_TYPE_HIDE_PORTAL).start();
+    protected PortalBuilder setHideType(){
+        return intentType(PortalManager.INTENT_TYPE_HIDE_PORTAL);
     }
 
     @Override
-    public void close() {
-        this.intentType(PortalManager.INTENT_TYPE_CLOSE_PORTAL).start();
+    protected PortalBuilder setCloseType(){
+        return intentType(PortalManager.INTENT_TYPE_CLOSE_PORTAL);
     }
 
     @Override
-    public void send(Class<? extends AbstractPortal> type) {
+    protected PortalBuilder setSendType(Class<? extends AbstractPortal> type){
         this.type = type;
-        this.intentType(PortalManager.INTENT_TYPE_PORTAL_DATA).start();
+        return intentType(PortalManager.INTENT_TYPE_SEND_PORTAL);
     }
 }
