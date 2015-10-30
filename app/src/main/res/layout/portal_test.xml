@@ -40,5 +40,12 @@
             android:layout_height="wrap_content"
             android:text="Close service" />
 
+        <Button
+            android:id="@+id/btn_activity_for_result"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Activity for result" />
+
+
     </LinearLayout>
 </in.workarounds.portal.WrapperLayout>

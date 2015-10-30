@@ -1,6 +1,7 @@
 package in.workarounds.portal;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
@@ -80,6 +81,11 @@ public class Portlet extends AbstractPortal {
 
     public void setPortalManager(PortalManager portalManager) {
         mPortalManager = portalManager;
+    }
+
+    @Override
+    public void startActivityForResult(Intent intent, int requestCode) {
+        mPortalManager.startActivityForResult(intent, requestCode);
     }
 
     public static boolean isValidID(int id) {

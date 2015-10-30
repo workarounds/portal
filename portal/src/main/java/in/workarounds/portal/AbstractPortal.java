@@ -1,7 +1,9 @@
 package in.workarounds.portal;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.IdRes;
@@ -18,6 +20,10 @@ import android.widget.FrameLayout;
  * Created by madki on 16/09/15.
  */
 public abstract class AbstractPortal extends ContextWrapper {
+    public static final int RESULT_OK = Activity.RESULT_OK;
+    public static final int RESULT_CANCELLED = Activity.RESULT_CANCELED;
+    public static final int RESULT_DESTROYED = -2;
+
     public static final int STATE_HIDDEN = 1;
     public static final int STATE_ACTIVE = 2;
 
@@ -94,4 +100,9 @@ public abstract class AbstractPortal extends ContextWrapper {
     public @interface PORTAL_STATE {
     }
 
+    public abstract void startActivityForResult(Intent intent, int requestCode);
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+    }
 }

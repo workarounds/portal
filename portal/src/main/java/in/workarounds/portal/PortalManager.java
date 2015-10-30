@@ -27,7 +27,7 @@ import in.workarounds.portal.WrapperLayout.Reason;
  * Created by madki on 16/09/15.
  */
 @Freighter
-public class PortalManager extends Service implements WrapperLayout.OnCloseDialogsListener {
+public class PortalManager extends ForegroundService implements WrapperLayout.OnCloseDialogsListener {
     private static final String TAG = "PortalManager";
 
     @Cargo @INTENT_TYPE
@@ -36,12 +36,6 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
     String className;
     @Cargo @NonNull
     Bundle data = new Bundle();
-    @Cargo
-    int requestCode;
-    @Cargo
-    int resultCode;
-    @Cargo
-    Intent activityResult;
     @Cargo
     int portletId = -1;
 
@@ -66,7 +60,11 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null) {
             FreighterPortalManager.Retriever retriever = FreighterPortalManager.retrieve(intent);
-            resolveIntent(retriever.intentType(intentType), retriever);
+            if(retriever.hasIntentType()) {
+                resolveIntent(retriever.intentType(intentType), retriever);
+            } else {
+                super.onStartCommand(intent, flags, startId);
+            }
         }
         return START_STICKY;
     }
@@ -82,6 +80,16 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
         }
         PortalState.getInstance(this).clear();
         PortletState.getInstance(this).clear();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(mPortal != null) {
+            mPortal.onActivityResult(requestCode, resultCode, data);
+        }
+        for(Portlet portlet: mPortlets.values()) {
+            portlet.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     protected void resolveIntent(int intentType, FreighterPortalManager.Retriever retriever) {

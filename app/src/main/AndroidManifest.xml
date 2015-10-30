@@ -22,8 +22,9 @@
         <service
             android:name="in.workarounds.portal.PortalManager"
             android:enabled="true"
-            android:exported="false">
+            android:exported="false" >
         </service>
+
     </application>
 
 </manifest>
