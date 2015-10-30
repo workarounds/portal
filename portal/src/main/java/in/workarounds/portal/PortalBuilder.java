@@ -30,7 +30,7 @@ public class PortalBuilder extends IntentBuilder<PortalBuilder> {
     }
 
     @Override
-    protected PortalBuilder intentType(@PortalManager.PM_INTENT_ID int intentType) {
+    protected PortalBuilder intentType(@PortalManager.INTENT_TYPE int intentType) {
         this.intentType = intentType;
         return this;
     }
@@ -38,27 +38,27 @@ public class PortalBuilder extends IntentBuilder<PortalBuilder> {
     @Override
     protected PortalBuilder setOpenType(Class<? extends AbstractPortal> type){
         this.type = type;
-        return intentType(PortalManager.INTENT_TYPE_OPEN_PORTAL);
+        return intentType(PortalManager.IntentType.OPEN_PORTAL);
     }
 
     @Override
     protected PortalBuilder setShowType(){
-        return intentType(PortalManager.INTENT_TYPE_SHOW_PORTAL);
+        return intentType(PortalManager.IntentType.SHOW_PORTAL);
     }
 
     @Override
     protected PortalBuilder setHideType(){
-        return intentType(PortalManager.INTENT_TYPE_HIDE_PORTAL);
+        return intentType(PortalManager.IntentType.HIDE_PORTAL);
     }
 
     @Override
     protected PortalBuilder setCloseType(){
-        return intentType(PortalManager.INTENT_TYPE_CLOSE_PORTAL);
+        return intentType(PortalManager.IntentType.CLOSE_PORTAL);
     }
 
     @Override
     protected PortalBuilder setSendType(Class<? extends AbstractPortal> type){
         this.type = type;
-        return intentType(PortalManager.INTENT_TYPE_SEND_PORTAL);
+        return intentType(PortalManager.IntentType.SEND_PORTAL);
     }
 }

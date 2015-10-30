@@ -10,7 +10,8 @@ import android.os.Bundle;
 public abstract class IntentBuilder<T extends IntentBuilder> {
     private static final String TAG = "IntentBuilder";
     protected Context context;
-    protected @PortalManager.PM_INTENT_ID int intentType;
+    protected @PortalManager.INTENT_TYPE
+    int intentType;
     protected Class<? extends AbstractPortal> type;
     protected Bundle data;
     protected Class<? extends PortalManager> manager;
@@ -23,7 +24,7 @@ public abstract class IntentBuilder<T extends IntentBuilder> {
 
     public abstract  <S extends PortalManager> T manager(Class<S> managerType);
 
-    protected abstract T intentType(@PortalManager.PM_INTENT_ID int intentType);
+    protected abstract T intentType(@PortalManager.INTENT_TYPE int intentType);
 
     public void open(Class<? extends AbstractPortal> type) {
         setOpenType(type).start();
@@ -82,11 +83,13 @@ public abstract class IntentBuilder<T extends IntentBuilder> {
             data = new Bundle();
         }
         Intent intent = new Intent(context, manager);
+        FreighterPortalManager.Supplier supplier = FreighterPortalManager.supply();
         if(requireType()) {
-            intent.putExtra(PortalManager.INTENT_KEY_CLASS, type.getName());
+            supplier.className(type.getName());
         }
-        intent.putExtra(PortalManager.INTENT_KEY_DATA, data);
-        intent.putExtra(PortalManager.INTENT_KEY_INTENT_TYPE, intentType);
+        supplier.data(data);
+        supplier.intentType(intentType);
+        intent.putExtras(supplier.bundle());
         return intent;
     }
 
@@ -95,10 +98,10 @@ public abstract class IntentBuilder<T extends IntentBuilder> {
     }
 
     protected boolean requireType() {
-        return (intentType == PortalManager.INTENT_TYPE_OPEN_PORTAL
-                || intentType == PortalManager.INTENT_TYPE_OPEN_PORTLET
-                || intentType == PortalManager.INTENT_TYPE_SEND_PORTAL
-                || intentType == PortalManager.INTENT_TYPE_SEND_PORTLET
+        return (intentType == PortalManager.IntentType.OPEN_PORTAL
+                || intentType == PortalManager.IntentType.OPEN_PORTLET
+                || intentType == PortalManager.IntentType.SEND_PORTAL
+                || intentType == PortalManager.IntentType.SEND_PORTLET
         );
     }
 }

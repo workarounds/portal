@@ -3,6 +3,7 @@ package in.workarounds.portal;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.os.Bundle;
+import android.support.annotation.CallSuper;
 import android.support.annotation.IdRes;
 import android.support.annotation.IntDef;
 import android.support.annotation.LayoutRes;
@@ -72,10 +73,12 @@ public abstract class AbstractPortal extends ContextWrapper {
 
     }
 
+    @CallSuper
     protected void onResume() {
         mState = STATE_ACTIVE;
     }
 
+    @CallSuper
     protected void onPause() {
         mState = STATE_HIDDEN;
     }

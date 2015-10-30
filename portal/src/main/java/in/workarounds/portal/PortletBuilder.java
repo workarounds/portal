@@ -32,7 +32,7 @@ public class PortletBuilder extends IntentBuilder<PortletBuilder> {
     }
 
     @Override
-    protected PortletBuilder intentType(@PortalManager.PM_INTENT_ID int intentType) {
+    protected PortletBuilder intentType(@PortalManager.INTENT_TYPE int intentType) {
         this.intentType = intentType;
         return this;
     }
@@ -51,34 +51,34 @@ public class PortletBuilder extends IntentBuilder<PortletBuilder> {
         if(!Portlet.isValidID(id)) {
             throw new IllegalArgumentException("Portlet id invalid");
         }
-        intent.putExtra(PortalManager.INTENT_KEY_PORTLET_ID, id);
+        intent.putExtra(FreighterPortalManager.Keys.PORTLET_ID, id);
         return intent;
     }
 
     @Override
     protected PortletBuilder setOpenType(Class<? extends AbstractPortal> type){
         this.type = type;
-        return intentType(PortalManager.INTENT_TYPE_OPEN_PORTLET);
+        return intentType(PortalManager.IntentType.OPEN_PORTLET);
     }
 
     @Override
     protected PortletBuilder setShowType(){
-        return intentType(PortalManager.INTENT_TYPE_SHOW_PORTLET);
+        return intentType(PortalManager.IntentType.SHOW_PORTLET);
     }
 
     @Override
     protected PortletBuilder setHideType(){
-        return intentType(PortalManager.INTENT_TYPE_HIDE_PORTLET);
+        return intentType(PortalManager.IntentType.HIDE_PORTLET);
     }
 
     @Override
     protected PortletBuilder setCloseType(){
-        return intentType(PortalManager.INTENT_TYPE_CLOSE_PORTLET);
+        return intentType(PortalManager.IntentType.CLOSE_PORTLET);
     }
 
     @Override
     protected PortletBuilder setSendType(Class<? extends AbstractPortal> type){
         this.type = type;
-        return intentType(PortalManager.INTENT_TYPE_SEND_PORTLET);
+        return intentType(PortalManager.IntentType.SEND_PORTLET);
     }
 }

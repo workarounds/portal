@@ -19,35 +19,31 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import in.workarounds.freighter.annotations.Cargo;
+import in.workarounds.freighter.annotations.Freighter;
 import in.workarounds.portal.WrapperLayout.Reason;
 
 /**
  * Created by madki on 16/09/15.
  */
-public class PortalManager extends Service implements WrapperLayout.OnCloseDialogsListener{
+@Freighter
+public class PortalManager extends Service implements WrapperLayout.OnCloseDialogsListener {
     private static final String TAG = "PortalManager";
 
-    protected static final String INTENT_KEY_INTENT_TYPE = "intent_key_intent_type";
-    protected static final int INTENT_TYPE_NO_TYPE = 0;
-    protected static final int INTENT_TYPE_OPEN_PORTAL   = 1;
-    protected static final int INTENT_TYPE_CLOSE_PORTAL  = 2;
-    protected static final int INTENT_TYPE_HIDE_PORTAL   = 3;
-    protected static final int INTENT_TYPE_SHOW_PORTAL   = 4;
-    protected static final int INTENT_TYPE_SEND_PORTAL   = 5;
-
-    protected static final int INTENT_TYPE_OPEN_PORTLET  = 11;
-    protected static final int INTENT_TYPE_CLOSE_PORTLET = 12;
-    protected static final int INTENT_TYPE_HIDE_PORTLET  = 13;
-    protected static final int INTENT_TYPE_SHOW_PORTLET  = 14;
-    protected static final int INTENT_TYPE_SEND_PORTLET  = 15;
-
-    protected static final int INTENT_TYPE_CLOSE_MANAGER = 100;
-    protected static final int INTENT_TYPE_SEND_TO_ALL   = 101;
-
-    protected static final String INTENT_KEY_CLASS = "intent_key_class";
-    protected static final String INTENT_KEY_DATA = "intent_key_data";
-
-    protected static final String INTENT_KEY_PORTLET_ID     = "intent_key_portlet_id";
+    @Cargo @INTENT_TYPE
+    int intentType = IntentType.NO_TYPE;
+    @Cargo
+    String className;
+    @Cargo @NonNull
+    Bundle data = new Bundle();
+    @Cargo
+    int requestCode;
+    @Cargo
+    int resultCode;
+    @Cargo
+    Intent activityResult;
+    @Cargo
+    int portletId = -1;
 
     protected Portal mPortal;
     protected HashMap<Integer, Portlet> mPortlets;
@@ -68,9 +64,9 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if(intent != null) {
-            int intentType = intent.getIntExtra(INTENT_KEY_INTENT_TYPE, INTENT_TYPE_NO_TYPE);
-            resolveIntent(intentType, intent);
+        if (intent != null) {
+            FreighterPortalManager.Retriever retriever = FreighterPortalManager.retrieve(intent);
+            resolveIntent(retriever.intentType(intentType), retriever);
         }
         return START_STICKY;
     }
@@ -88,69 +84,70 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
         PortletState.getInstance(this).clear();
     }
 
-    protected void resolveIntent(int intentType, @NonNull Intent intent) {
+    protected void resolveIntent(int intentType, FreighterPortalManager.Retriever retriever) {
         switch (intentType) {
-            case INTENT_TYPE_OPEN_PORTAL:
-                openPortal(intent);
+            case IntentType.OPEN_PORTAL:
+                openPortal(retriever.className(), retriever.data());
                 break;
-            case INTENT_TYPE_HIDE_PORTAL:
+            case IntentType.HIDE_PORTAL:
                 hidePortal();
                 break;
-            case INTENT_TYPE_SHOW_PORTAL:
+            case IntentType.SHOW_PORTAL:
                 showPortal();
                 break;
-            case INTENT_TYPE_CLOSE_PORTAL:
+            case IntentType.CLOSE_PORTAL:
                 closePortal();
                 checkForTermination();
                 break;
-            case INTENT_TYPE_OPEN_PORTLET:
-                openPortlet(intent);
+            case IntentType.OPEN_PORTLET:
+                openPortlet(retriever.portletId(portletId), retriever.className(), retriever.data());
                 break;
-            case INTENT_TYPE_HIDE_PORTLET:
-                hidePortlet(intent.getIntExtra(INTENT_KEY_PORTLET_ID, -1));
+            case IntentType.HIDE_PORTLET:
+                hidePortlet(retriever.portletId(portletId));
                 break;
-            case INTENT_TYPE_SHOW_PORTLET:
-                showPortlet(intent.getIntExtra(INTENT_KEY_PORTLET_ID, -1));
+            case IntentType.SHOW_PORTLET:
+                showPortlet(retriever.portletId(portletId));
                 break;
-            case INTENT_TYPE_CLOSE_PORTLET:
-                closePortlet(intent.getIntExtra(INTENT_KEY_PORTLET_ID, -1));
+            case IntentType.CLOSE_PORTLET:
+                closePortlet(retriever.portletId(portletId));
                 checkForTermination();
                 break;
-            case INTENT_TYPE_CLOSE_MANAGER:
+            case IntentType.CLOSE_MANAGER:
                 closeManager();
                 break;
-            case INTENT_TYPE_SEND_PORTAL:
-                sendDataToPortal(intent);
+            case IntentType.SEND_PORTAL:
+                sendDataToPortal(retriever.className(), retriever.data());
                 break;
-            case INTENT_TYPE_SEND_PORTLET:
-                sendDataToPortlet(intent, intent.getIntExtra(INTENT_KEY_PORTLET_ID, -1));
+            case IntentType.SEND_PORTLET:
+                Log.d(TAG, "send portlet type");
+                sendDataToPortlet(retriever.portletId(portletId), retriever.className(), retriever.data());
                 break;
-            case INTENT_TYPE_SEND_TO_ALL:
-                sendData(intent);
+            case IntentType.SEND_TO_ALL:
+                sendData(retriever.data());
                 break;
-            case INTENT_TYPE_NO_TYPE:
+            case IntentType.NO_TYPE:
                 break;
         }
     }
 
-    protected void openPortal(Intent intent) {
-        openPortal(createPortal(intent));
+    protected void openPortal(String className, Bundle data) {
+        openPortal(createPortal(className, data));
     }
 
     protected void openPortal(Portal portal) {
-        if(portal != null) {
+        if (portal != null) {
             closePortal();
             mPortal = portal;
             showPortal();
         }
     }
 
-    protected void openPortlet(Intent intent) {
-        openPortlet(createPortlet(intent));
+    protected void openPortlet(int portletId, String className, Bundle data) {
+        openPortlet(createPortlet(portletId, className, data));
     }
 
     protected void openPortlet(Portlet portlet) {
-        if(portlet != null && Portlet.isValidID(portlet.getId())) {
+        if (portlet != null && Portlet.isValidID(portlet.getId())) {
             closePortlet(portlet.getId());
             addPortlet(portlet);
             showPortlet(portlet.getId());
@@ -158,10 +155,10 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
     }
 
     @Nullable
-    protected Portal createPortal(Intent intent) {
-        Portal portal = constructPortal(intent.getStringExtra(INTENT_KEY_CLASS));
-        if(portal != null) {
-            portal.onCreate(intent.getBundleExtra(INTENT_KEY_DATA));
+    protected Portal createPortal(String className, Bundle data) {
+        Portal portal = constructPortal(className);
+        if (portal != null) {
+            portal.onCreate(data);
             portal.setPortalManager(this);
         } else {
             Log.e(TAG, "Problem creating portal");
@@ -170,13 +167,12 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
     }
 
     @Nullable
-    protected Portlet createPortlet(Intent intent) {
-        int portletId = intent.getIntExtra(INTENT_KEY_PORTLET_ID, -1);
+    protected Portlet createPortlet(int portletId, String className, Bundle data) {
         Portlet portlet = null;
-        if(portletId != -1) {
-            portlet = constructPortlet(intent.getStringExtra(INTENT_KEY_CLASS), portletId);
-            if(portlet != null) {
-                portlet.onCreate(intent.getBundleExtra(INTENT_KEY_DATA));
+        if (portletId != -1) {
+            portlet = constructPortlet(className, portletId);
+            if (portlet != null) {
+                portlet.onCreate(data);
                 portlet.setPortalManager(this);
             }
         }
@@ -185,7 +181,7 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
 
     protected void closePortal() {
         hidePortal();
-        if(mPortal != null) {
+        if (mPortal != null) {
             mPortal.onDestroy();
             mPortal = null;
         }
@@ -197,14 +193,14 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
 
     protected void closePortlet(Portlet portlet) {
         hidePortlet(portlet);
-        if(portlet != null) {
+        if (portlet != null) {
             portlet.onDestroy();
             removePortlet(portlet.getId());
         }
     }
 
     protected void showPortal() {
-        if(mPortal != null && mPortal.getState() != AbstractPortal.STATE_ACTIVE) {
+        if (mPortal != null && mPortal.getState() != AbstractPortal.STATE_ACTIVE) {
             attachToWindow(mPortal.getView(), mPortal.getLayoutParams());
             // TODO add animation
             mPortal.addOnCloseDialogsListener(this);
@@ -217,14 +213,14 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
     }
 
     protected void showPortlet(Portlet portlet) {
-        if(portlet != null && portlet.getState() != AbstractPortal.STATE_ACTIVE) {
+        if (portlet != null && portlet.getState() != AbstractPortal.STATE_ACTIVE) {
             attachToWindow(portlet.getView(), portlet.getLayoutParams());
             portlet.onResume();
         }
     }
 
     protected void hidePortal() {
-        if(mPortal != null && mPortal.getState() == AbstractPortal.STATE_ACTIVE) {
+        if (mPortal != null && mPortal.getState() == AbstractPortal.STATE_ACTIVE) {
             // TODO add animation
             mPortal.onPause();
             mPortal.removeOnCloseDialogsListener(this);
@@ -238,35 +234,35 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
     }
 
     protected void hidePortlet(Portlet portlet) {
-        if(portlet != null && portlet.getState() == AbstractPortal.STATE_ACTIVE) {
+        if (portlet != null && portlet.getState() == AbstractPortal.STATE_ACTIVE) {
             portlet.onPause();
             detachFromWindow(portlet.getView());
         }
     }
 
-    protected void sendData(Intent intent) {
-        if(mPortal != null){
-            sendDataToPortal(intent);
+    protected void sendData(Bundle data) {
+        if (mPortal != null) {
+            sendDataToPortal(null, data);
         }
-        for (int id: mPortlets.keySet()) {
-            sendDataToPortlet(intent, id);
-        }
-    }
-
-    protected void sendDataToPortal(Intent intent) {
-        if(mPortal != null) {
-            mPortal.onData(intent.getBundleExtra(INTENT_KEY_DATA));
-        } else {
-            openPortal(intent);
+        for (int id : mPortlets.keySet()) {
+            sendDataToPortlet(id, null, data);
         }
     }
 
-    protected void sendDataToPortlet(Intent intent, int id) {
-        Portlet portlet = getPortlet(id);
-        if(portlet != null) {
-            portlet.onData(intent.getBundleExtra(INTENT_KEY_DATA));
+    protected void sendDataToPortal(String className, Bundle data) {
+        if (mPortal != null) {
+            mPortal.onData(data);
         } else {
-            openPortlet(intent);
+            openPortal(className, data);
+        }
+    }
+
+    protected void sendDataToPortlet(int portletId, String className, Bundle data) {
+        Portlet portlet = getPortlet(portletId);
+        if (portlet != null) {
+            portlet.onData(data);
+        } else {
+            openPortlet(portletId, className, data);
         }
     }
 
@@ -285,13 +281,13 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
     }
 
     protected void addPortlet(Portlet portlet) {
-        if(Portlet.isValidID(portlet.getId())) {
+        if (Portlet.isValidID(portlet.getId())) {
             mPortlets.put(portlet.getId(), portlet);
         }
     }
 
     protected void removePortlet(int portletId) {
-        if(mPortlets.containsKey(portletId)) {
+        if (mPortlets.containsKey(portletId)) {
             mPortlets.remove(portletId);
         }
     }
@@ -307,7 +303,7 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
     @Nullable
     protected Class<?> getTypeFromName(String className) {
         Class<?> type = null;
-        if(!TextUtils.isEmpty(className)) {
+        if (!TextUtils.isEmpty(className)) {
             try {
                 type = Class.forName(className);
             } catch (ClassNotFoundException e) {
@@ -322,7 +318,7 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
     @Nullable
     protected Constructor<?> getPortalConstructor(Class<?> type) {
         Constructor<?> constructor = null;
-        if(type != null) {
+        if (type != null) {
             try {
                 constructor = type.getConstructor(Context.class);
             } catch (NoSuchMethodException e) {
@@ -337,7 +333,7 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
     @Nullable
     protected Constructor<?> getPortletConstructor(Class<?> type) {
         Constructor<?> constructor = null;
-        if(type != null) {
+        if (type != null) {
             try {
                 constructor = type.getConstructor(Context.class, int.class);
             } catch (NoSuchMethodException e) {
@@ -352,7 +348,7 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
     @Nullable
     protected Portal constructPortal(Constructor<?> constructor) {
         Portal portal = null;
-        if(constructor != null) {
+        if (constructor != null) {
             try {
                 portal = (Portal) constructor.newInstance(this);
             } catch (InstantiationException e) {
@@ -371,7 +367,7 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
     @Nullable
     protected Portlet constructPortlet(Constructor<?> constructor, int portletId) {
         Portlet portlet = null;
-        if(constructor != null) {
+        if (constructor != null) {
             try {
                 portlet = (Portlet) constructor.newInstance(this, portletId);
             } catch (InstantiationException e) {
@@ -401,7 +397,7 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
     public void onCloseDialogs(Reason reason) {
         switch (reason) {
             case KEY_BACK:
-                if(mPortal != null) {
+                if (mPortal != null) {
                     mPortal.onBackPressed();
                 }
                 break;
@@ -419,7 +415,10 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
 
     public static <S extends PortalManager> void close(Context context, Class<S> type) {
         Intent intent = new Intent(context, type);
-        intent.putExtra(PortalManager.INTENT_KEY_INTENT_TYPE, PortalManager.INTENT_TYPE_CLOSE_MANAGER);
+        intent.putExtras(FreighterPortalManager.supply()
+                        .intentType(IntentType.CLOSE_MANAGER)
+                        .bundle()
+        );
         context.startService(intent);
     }
 
@@ -429,30 +428,61 @@ public class PortalManager extends Service implements WrapperLayout.OnCloseDialo
 
     public static <S extends PortalManager> void send(Context context, Bundle data, Class<S> type) {
         Intent intent = new Intent(context, type);
-        intent.putExtra(PortalManager.INTENT_KEY_INTENT_TYPE, PortalManager.INTENT_TYPE_SEND_TO_ALL);
-        intent.putExtra(PortalManager.INTENT_KEY_DATA, data);
+        intent.putExtras(FreighterPortalManager.supply()
+                        .intentType(IntentType.SEND_TO_ALL)
+                        .data(data)
+                        .bundle()
+        );
         context.startService(intent);
     }
 
-    public static @State.STATE int getPortalState(Context context, Class<? extends Portal> type){
+    public static
+    @State.STATE
+    int getPortalState(Context context, Class<? extends Portal> type) {
         return PortalState.getInstance(context).getState(type);
     }
 
-    public static @State.STATE int getPortletState(Context context, int id){
+    public static
+    @State.STATE
+    int getPortletState(Context context, int id) {
         return PortletState.getInstance(context).getState(id);
     }
 
     private void checkForTermination() {
-        if(mPortal == null && mPortlets.isEmpty()) {
+        if (mPortal == null && mPortlets.isEmpty()) {
             stopSelf();
         }
     }
 
-    @IntDef({INTENT_TYPE_NO_TYPE, INTENT_TYPE_OPEN_PORTAL, INTENT_TYPE_SHOW_PORTAL,
-            INTENT_TYPE_HIDE_PORTAL, INTENT_TYPE_CLOSE_PORTAL, INTENT_TYPE_OPEN_PORTLET,
-            INTENT_TYPE_SHOW_PORTLET, INTENT_TYPE_HIDE_PORTLET, INTENT_TYPE_CLOSE_PORTLET,
-            INTENT_TYPE_CLOSE_MANAGER, INTENT_TYPE_SEND_PORTLET, INTENT_TYPE_SEND_PORTAL, INTENT_TYPE_SEND_TO_ALL
+
+    @IntDef({IntentType.NO_TYPE, IntentType.OPEN_PORTAL, IntentType.SHOW_PORTAL,
+            IntentType.HIDE_PORTAL, IntentType.CLOSE_PORTAL, IntentType.OPEN_PORTLET,
+            IntentType.SHOW_PORTLET, IntentType.HIDE_PORTLET, IntentType.CLOSE_PORTLET,
+            IntentType.CLOSE_MANAGER, IntentType.SEND_PORTLET, IntentType.SEND_PORTAL,
+            IntentType.SEND_TO_ALL, IntentType.ACTIVITY_RESULT
     })
-    public @interface PM_INTENT_ID {
+    public @interface INTENT_TYPE {
+    }
+
+
+
+    public interface IntentType {
+        int NO_TYPE = 0;
+        int OPEN_PORTAL = 1;
+        int CLOSE_PORTAL = 2;
+        int HIDE_PORTAL = 3;
+        int SHOW_PORTAL = 4;
+        int SEND_PORTAL = 5;
+
+        int OPEN_PORTLET = 11;
+        int CLOSE_PORTLET = 12;
+        int HIDE_PORTLET = 13;
+        int SHOW_PORTLET = 14;
+        int SEND_PORTLET = 15;
+
+        int CLOSE_MANAGER = 100;
+        int SEND_TO_ALL = 101;
+        int ACTIVITY_RESULT = 102;
+
     }
 }

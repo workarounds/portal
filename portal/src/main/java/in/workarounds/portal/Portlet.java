@@ -3,6 +3,7 @@ package in.workarounds.portal;
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
+import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.WindowManager;
@@ -49,28 +50,28 @@ public class Portlet extends AbstractPortal {
         Portlet.with(this).id(getId()).manager(mPortalManager.getClass()).close();
     }
 
-    @Override
+    @Override @CallSuper
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         PortletState.getInstance(this)
                 .setState(getId(), State.HIDDEN);
     }
 
-    @Override
+    @Override @CallSuper
     protected void onResume() {
         super.onResume();
         PortletState.getInstance(this)
                 .setState(getId(), State.ACTIVE);
     }
 
-    @Override
+    @Override @CallSuper
     protected void onPause() {
         super.onPause();
         PortletState.getInstance(this)
                 .setState(getId(), State.HIDDEN);
     }
 
-    @Override
+    @Override @CallSuper
     protected void onDestroy() {
         super.onDestroy();
         PortletState.getInstance(this)

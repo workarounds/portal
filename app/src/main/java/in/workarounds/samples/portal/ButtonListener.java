@@ -69,6 +69,7 @@ public class ButtonListener implements View.OnClickListener {
                 break;
             case R.id.btn_send_portlet:
                 Portlet.with(context).id(getIdFromET()).data(bundle).send(TestPortlet.class);
+                break;
             case R.id.btn_close_service:
                 PortalManager.close(context);
                 break;
