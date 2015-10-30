@@ -16,6 +16,9 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
 /**
  * Created by madki on 16/09/15.
  */
@@ -97,6 +100,7 @@ public abstract class AbstractPortal extends ContextWrapper {
     public abstract void setPortalManager(PortalManager portalManager);
 
     @IntDef({STATE_HIDDEN, STATE_ACTIVE})
+    @Retention(RetentionPolicy.SOURCE)
     public @interface PORTAL_STATE {
     }
 

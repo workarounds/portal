@@ -1,6 +1,5 @@
 package in.workarounds.portal;
 
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,6 +12,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -469,6 +470,7 @@ public class PortalManager extends ForegroundService implements WrapperLayout.On
             IntentType.CLOSE_MANAGER, IntentType.SEND_PORTLET, IntentType.SEND_PORTAL,
             IntentType.SEND_TO_ALL, IntentType.ACTIVITY_RESULT
     })
+    @Retention(RetentionPolicy.SOURCE)
     public @interface INTENT_TYPE {
     }
 
