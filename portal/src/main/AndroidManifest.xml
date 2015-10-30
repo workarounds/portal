@@ -3,12 +3,18 @@
 
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
-    <application android:allowBackup="true" android:label="@string/app_name">
+    <application
+        android:allowBackup="true"
+        android:label="@string/app_name">
         <service
             android:name="in.workarounds.portal.PortalManager"
             android:enabled="true"
-            android:exported="false">
-        </service>
+            android:exported="false" />
+
+        <activity
+            android:name=".BlankActivity"
+            android:excludeFromRecents="true"
+            android:theme="@style/TransparentActivity" />
     </application>
 
 </manifest>
