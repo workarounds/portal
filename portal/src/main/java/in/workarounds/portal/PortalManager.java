@@ -183,11 +183,12 @@ public class PortalManager extends ForegroundService implements WrapperLayout.On
 
         builder.setContentIntent(resultPendingIntent);
         notificationManager.notify(PERMISSION_NOTIFICATION_ID, builder.build());
-
+        checkForTermination();
     }
 
     protected void onPermissionDenied() {
         Toast.makeText(this, getString(R.string.overlay_permission_denied), Toast.LENGTH_LONG).show();
+        checkForTermination();
     }
 
     protected void resolveIntent() {
@@ -312,7 +313,15 @@ public class PortalManager extends ForegroundService implements WrapperLayout.On
                         PendingIntent.FLAG_UPDATE_CURRENT
                 );
 
+        PendingIntent deleteIntent = PendingIntent.getService(
+                this,
+                0,
+                FreighterPortalManager.supply().intentType(IntentType.CLOSE_MANAGER).intent(this),
+                PendingIntent.FLAG_UPDATE_CURRENT
+        );
+
         builder.setContentIntent(resultPendingIntent);
+        builder.setDeleteIntent(deleteIntent);
         notificationManager.notify(PERMISSION_NOTIFICATION_ID, builder.build());
     }
 
