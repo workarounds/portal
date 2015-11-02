@@ -1,5 +1,6 @@
 package in.workarounds.portal;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -38,7 +39,6 @@ import in.workarounds.portal.WrapperLayout.Reason;
 public class PortalManager extends ForegroundService implements WrapperLayout.OnCloseDialogsListener {
     private static final String TAG = "PortalManager";
     protected static final int DRAW_OVER_OTHER_APPS = 1;
-    protected static final int PERMISSION_NOTIFICATION_ID = 1;
 
     @Cargo
     @INTENT_TYPE
@@ -73,6 +73,7 @@ public class PortalManager extends ForegroundService implements WrapperLayout.On
         portlets = new HashMap<>();
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        startForeground(NotificationId.FOREGROUND_NOTIFICATION_ID, getForegroundNotification());
     }
 
     @Override
@@ -81,7 +82,7 @@ public class PortalManager extends ForegroundService implements WrapperLayout.On
         FreighterPortalManager.inject(this, intent);
         if (intentType != IntentType.ACTIVITY_RESULT && intentType != IntentType.NO_TYPE) {
             if (needsOverlayPermission()) {
-                if(hasOverlayPermission()) {
+                if (hasOverlayPermission()) {
                     resolveIntent();
                 } else {
                     currentIntent = intent;
@@ -90,8 +91,8 @@ public class PortalManager extends ForegroundService implements WrapperLayout.On
             } else {
                 resolveIntent();
             }
-        } else if(intentType == IntentType.ACTIVITY_RESULT) {
-            if(requestCode == DRAW_OVER_OTHER_APPS) {
+        } else if (intentType == IntentType.ACTIVITY_RESULT) {
+            if (requestCode == DRAW_OVER_OTHER_APPS) {
                 Toast.makeText(this, getString(R.string.overlay_permission_rationale), Toast.LENGTH_LONG).show();
             }
             startActivityForResult(activityIntent, requestCode);
@@ -143,12 +144,13 @@ public class PortalManager extends ForegroundService implements WrapperLayout.On
         }
         PortalState.getInstance(this).clear();
         PortletState.getInstance(this).clear();
+        notificationManager.cancel(DRAW_OVER_OTHER_APPS);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == DRAW_OVER_OTHER_APPS) {
-            if(hasOverlayPermission()) {
+        if (requestCode == DRAW_OVER_OTHER_APPS) {
+            if (hasOverlayPermission()) {
                 onPermissionApproved();
             } else {
                 onPermissionDenied();
@@ -163,8 +165,26 @@ public class PortalManager extends ForegroundService implements WrapperLayout.On
         }
     }
 
+    protected Notification getForegroundNotification() {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+                .setSmallIcon(R.drawable.ic_notification_icon)
+                .setContentTitle(getString(R.string.app_name))
+                .setContentText(getString(R.string.foreground_notification));
+        PendingIntent deleteIntent = PendingIntent.getService(
+                this,
+                NotificationId.PENDING_FOREGROND_NOTIFICATION,
+                FreighterPortalManager.supply().intentType(IntentType.CLOSE_MANAGER).intent(this),
+                PendingIntent.FLAG_UPDATE_CURRENT
+        );
+
+        builder.setContentIntent(deleteIntent);
+        return builder.build();
+    }
+
     protected void onPermissionApproved() {
-                NotificationCompat.Builder builder =
+        if(currentIntent == null) return;
+
+        NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(this)
                         .setAutoCancel(true)
                         .setSmallIcon(R.drawable.ic_notification_icon)
@@ -176,13 +196,13 @@ public class PortalManager extends ForegroundService implements WrapperLayout.On
         PendingIntent resultPendingIntent =
                 PendingIntent.getService(
                         this,
-                        0,
+                        NotificationId.PENDING_RESULT_APPROVED,
                         currentIntent,
                         PendingIntent.FLAG_UPDATE_CURRENT
                 );
 
         builder.setContentIntent(resultPendingIntent);
-        notificationManager.notify(PERMISSION_NOTIFICATION_ID, builder.build());
+        notificationManager.notify(NotificationId.PERMISSION_NOTIFICATION_ID, builder.build());
         checkForTermination();
     }
 
@@ -297,7 +317,7 @@ public class PortalManager extends ForegroundService implements WrapperLayout.On
                         .setContentText(getString(R.string.overlay_permission_notification));
 
         Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                        Uri.parse("package:" + getPackageName()));
+                Uri.parse("package:" + getPackageName()));
 
         Intent resultIntent = FreighterPortalManager.supply()
                 .intentType(IntentType.ACTIVITY_RESULT)
@@ -308,21 +328,21 @@ public class PortalManager extends ForegroundService implements WrapperLayout.On
         PendingIntent resultPendingIntent =
                 PendingIntent.getService(
                         this,
-                        0,
+                        NotificationId.PENDING_DRAW_OVER_APPS,
                         resultIntent,
                         PendingIntent.FLAG_UPDATE_CURRENT
                 );
 
         PendingIntent deleteIntent = PendingIntent.getService(
                 this,
-                0,
+                NotificationId.PENDING_DELETE_DRAW_OVER_APPS,
                 FreighterPortalManager.supply().intentType(IntentType.CLOSE_MANAGER).intent(this),
                 PendingIntent.FLAG_UPDATE_CURRENT
         );
 
         builder.setContentIntent(resultPendingIntent);
-        builder.setDeleteIntent(deleteIntent);
-        notificationManager.notify(PERMISSION_NOTIFICATION_ID, builder.build());
+//        builder.setDeleteIntent(deleteIntent);
+        notificationManager.notify(NotificationId.PERMISSION_NOTIFICATION_ID, builder.build());
     }
 
     protected void closePortal() {
@@ -625,6 +645,14 @@ public class PortalManager extends ForegroundService implements WrapperLayout.On
         int CLOSE_MANAGER = 100;
         int SEND_TO_ALL = 101;
         int ACTIVITY_RESULT = 102;
+    }
 
+    interface NotificationId {
+        int PENDING_DRAW_OVER_APPS = 10;
+        int PENDING_DELETE_DRAW_OVER_APPS = 11;
+        int PENDING_FOREGROND_NOTIFICATION = 12;
+        int PERMISSION_NOTIFICATION_ID = 13;
+        int FOREGROUND_NOTIFICATION_ID = 14;
+        int PENDING_RESULT_APPROVED = 14;
     }
 }
