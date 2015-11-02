@@ -1,16 +1,23 @@
 package in.workarounds.portal;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -30,19 +37,29 @@ import in.workarounds.portal.WrapperLayout.Reason;
 @Freighter
 public class PortalManager extends ForegroundService implements WrapperLayout.OnCloseDialogsListener {
     private static final String TAG = "PortalManager";
+    protected static final int DRAW_OVER_OTHER_APPS = 1;
+    protected static final int PERMISSION_NOTIFICATION_ID = 1;
 
-    @Cargo @INTENT_TYPE
+    @Cargo
+    @INTENT_TYPE
     int intentType = IntentType.NO_TYPE;
     @Cargo
     String className;
-    @Cargo @NonNull
+    @Cargo
+    @NonNull
     Bundle data = new Bundle();
     @Cargo
     int portletId = -1;
+    @Cargo
+    int requestCode;
+    @Cargo
+    Intent activityIntent;
 
+    protected Intent currentIntent;
     protected Portal mPortal;
-    protected HashMap<Integer, Portlet> mPortlets;
-    protected WindowManager mWindowManager;
+    protected HashMap<Integer, Portlet> portlets;
+    protected WindowManager windowManager;
+    protected NotificationManager notificationManager;
 
     @Nullable
     @Override
@@ -53,21 +70,66 @@ public class PortalManager extends ForegroundService implements WrapperLayout.On
     @Override
     public void onCreate() {
         super.onCreate();
-        mPortlets = new HashMap<>();
-        mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+        portlets = new HashMap<>();
+        windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+        notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent != null) {
-            FreighterPortalManager.Retriever retriever = FreighterPortalManager.retrieve(intent);
-            if(retriever.hasIntentType()) {
-                resolveIntent(retriever.intentType(intentType), retriever);
+        resetDefaults();
+        FreighterPortalManager.inject(this, intent);
+        if (intentType != IntentType.ACTIVITY_RESULT && intentType != IntentType.NO_TYPE) {
+            if (needsOverlayPermission()) {
+                if(hasOverlayPermission()) {
+                    resolveIntent();
+                } else {
+                    currentIntent = intent;
+                    promptForPermission();
+                }
             } else {
-                super.onStartCommand(intent, flags, startId);
+                resolveIntent();
             }
+        } else if(intentType == IntentType.ACTIVITY_RESULT) {
+            if(requestCode == DRAW_OVER_OTHER_APPS) {
+                Toast.makeText(this, getString(R.string.overlay_permission_rationale), Toast.LENGTH_LONG).show();
+            }
+            startActivityForResult(activityIntent, requestCode);
+        } else {
+            super.onStartCommand(intent, flags, startId);
         }
+
+
         return START_STICKY;
+    }
+
+    protected boolean needsOverlayPermission() {
+        if (intentType == IntentType.CLOSE_MANAGER
+                || intentType == IntentType.CLOSE_PORTAL
+                || intentType == IntentType.CLOSE_PORTLET
+                || intentType == IntentType.HIDE_PORTAL
+                || intentType == IntentType.HIDE_PORTLET
+                || intentType == IntentType.SHOW_PORTAL
+                || intentType == IntentType.SHOW_PORTLET
+                || intentType == IntentType.SEND_TO_ALL
+                ) {
+            return false;
+        }
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
+    }
+
+    protected boolean hasOverlayPermission() {
+        return !(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                || Settings.canDrawOverlays(this);
+    }
+
+    private void resetDefaults() {
+        intentType = IntentType.NO_TYPE;
+        className = null;
+        data = new Bundle();
+        portletId = -1;
+        activityIntent = null;
+        requestCode = -1;
     }
 
     @Override
@@ -75,7 +137,7 @@ public class PortalManager extends ForegroundService implements WrapperLayout.On
         super.onDestroy();
         closePortal();
         List<Integer> keys = new ArrayList<>();
-        keys.addAll(mPortlets.keySet());
+        keys.addAll(portlets.keySet());
         for (int i : keys) {
             closePortlet(i);
         }
@@ -85,18 +147,53 @@ public class PortalManager extends ForegroundService implements WrapperLayout.On
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(mPortal != null) {
-            mPortal.onActivityResult(requestCode, resultCode, data);
-        }
-        for(Portlet portlet: mPortlets.values()) {
-            portlet.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == DRAW_OVER_OTHER_APPS) {
+            if(hasOverlayPermission()) {
+                onPermissionApproved();
+            } else {
+                onPermissionDenied();
+            }
+        } else {
+            if (mPortal != null) {
+                mPortal.onActivityResult(requestCode, resultCode, data);
+            }
+            for (Portlet portlet : portlets.values()) {
+                portlet.onActivityResult(requestCode, resultCode, data);
+            }
         }
     }
 
-    protected void resolveIntent(int intentType, FreighterPortalManager.Retriever retriever) {
+    protected void onPermissionApproved() {
+                NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(this)
+                        .setAutoCancel(true)
+                        .setSmallIcon(R.drawable.ic_notification_icon)
+                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        .setVibrate(new long[0]) //mandatory for high priority,setting no vibration
+                        .setContentTitle(getString(R.string.app_name))
+                        .setContentText(getString(R.string.overlay_permission_granted_notification));
+
+        PendingIntent resultPendingIntent =
+                PendingIntent.getService(
+                        this,
+                        0,
+                        currentIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+
+        builder.setContentIntent(resultPendingIntent);
+        notificationManager.notify(PERMISSION_NOTIFICATION_ID, builder.build());
+
+    }
+
+    protected void onPermissionDenied() {
+        Toast.makeText(this, getString(R.string.overlay_permission_denied), Toast.LENGTH_LONG).show();
+    }
+
+    protected void resolveIntent() {
         switch (intentType) {
             case IntentType.OPEN_PORTAL:
-                openPortal(retriever.className(), retriever.data());
+                openPortal(className, data);
                 break;
             case IntentType.HIDE_PORTAL:
                 hidePortal();
@@ -109,30 +206,30 @@ public class PortalManager extends ForegroundService implements WrapperLayout.On
                 checkForTermination();
                 break;
             case IntentType.OPEN_PORTLET:
-                openPortlet(retriever.portletId(portletId), retriever.className(), retriever.data());
+                openPortlet(portletId, className, data);
                 break;
             case IntentType.HIDE_PORTLET:
-                hidePortlet(retriever.portletId(portletId));
+                hidePortlet(portletId);
                 break;
             case IntentType.SHOW_PORTLET:
-                showPortlet(retriever.portletId(portletId));
+                showPortlet(portletId);
                 break;
             case IntentType.CLOSE_PORTLET:
-                closePortlet(retriever.portletId(portletId));
+                closePortlet(portletId);
                 checkForTermination();
                 break;
             case IntentType.CLOSE_MANAGER:
                 closeManager();
                 break;
             case IntentType.SEND_PORTAL:
-                sendDataToPortal(retriever.className(), retriever.data());
+                sendDataToPortal(className, data);
                 break;
             case IntentType.SEND_PORTLET:
                 Log.d(TAG, "send portlet type");
-                sendDataToPortlet(retriever.portletId(portletId), retriever.className(), retriever.data());
+                sendDataToPortlet(portletId, className, data);
                 break;
             case IntentType.SEND_TO_ALL:
-                sendData(retriever.data());
+                sendData(data);
                 break;
             case IntentType.NO_TYPE:
                 break;
@@ -188,6 +285,37 @@ public class PortalManager extends ForegroundService implements WrapperLayout.On
         return portlet;
     }
 
+    protected void promptForPermission() {
+        NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(this)
+                        .setAutoCancel(true)
+                        .setSmallIcon(R.drawable.ic_notification_icon)
+                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        .setVibrate(new long[0]) //mandatory for high priority,setting no vibration
+                        .setContentTitle(getString(R.string.app_name))
+                        .setContentText(getString(R.string.overlay_permission_notification));
+
+        Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                        Uri.parse("package:" + getPackageName()));
+
+        Intent resultIntent = FreighterPortalManager.supply()
+                .intentType(IntentType.ACTIVITY_RESULT)
+                .activityIntent(intent)
+                .requestCode(DRAW_OVER_OTHER_APPS)
+                .intent(this);
+
+        PendingIntent resultPendingIntent =
+                PendingIntent.getService(
+                        this,
+                        0,
+                        resultIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+
+        builder.setContentIntent(resultPendingIntent);
+        notificationManager.notify(PERMISSION_NOTIFICATION_ID, builder.build());
+    }
+
     protected void closePortal() {
         hidePortal();
         if (mPortal != null) {
@@ -211,7 +339,6 @@ public class PortalManager extends ForegroundService implements WrapperLayout.On
     protected void showPortal() {
         if (mPortal != null && mPortal.getState() != AbstractPortal.STATE_ACTIVE) {
             attachToWindow(mPortal.getView(), mPortal.getLayoutParams());
-            // TODO add animation
             mPortal.addOnCloseDialogsListener(this);
             mPortal.onResume();
         }
@@ -230,7 +357,6 @@ public class PortalManager extends ForegroundService implements WrapperLayout.On
 
     protected void hidePortal() {
         if (mPortal != null && mPortal.getState() == AbstractPortal.STATE_ACTIVE) {
-            // TODO add animation
             mPortal.onPause();
             mPortal.removeOnCloseDialogsListener(this);
             detachFromWindow(mPortal.getView());
@@ -253,7 +379,7 @@ public class PortalManager extends ForegroundService implements WrapperLayout.On
         if (mPortal != null) {
             sendDataToPortal(null, data);
         }
-        for (int id : mPortlets.keySet()) {
+        for (int id : portlets.keySet()) {
             sendDataToPortlet(id, null, data);
         }
     }
@@ -286,27 +412,27 @@ public class PortalManager extends ForegroundService implements WrapperLayout.On
 
     @Nullable
     public Portlet getPortlet(int portletId) {
-        return mPortlets.get(portletId);
+        return portlets.get(portletId);
     }
 
     protected void addPortlet(Portlet portlet) {
         if (Portlet.isValidID(portlet.getId())) {
-            mPortlets.put(portlet.getId(), portlet);
+            portlets.put(portlet.getId(), portlet);
         }
     }
 
     protected void removePortlet(int portletId) {
-        if (mPortlets.containsKey(portletId)) {
-            mPortlets.remove(portletId);
+        if (portlets.containsKey(portletId)) {
+            portlets.remove(portletId);
         }
     }
 
     protected void attachToWindow(View view, WindowManager.LayoutParams params) {
-        mWindowManager.addView(view, params);
+        windowManager.addView(view, params);
     }
 
     protected void detachFromWindow(View view) {
-        mWindowManager.removeView(view);
+        windowManager.removeView(view);
     }
 
     @Nullable
@@ -445,20 +571,18 @@ public class PortalManager extends ForegroundService implements WrapperLayout.On
         context.startService(intent);
     }
 
-    public static
     @State.STATE
-    int getPortalState(Context context, Class<? extends Portal> type) {
+    public static int getPortalState(Context context, Class<? extends Portal> type) {
         return PortalState.getInstance(context).getState(type);
     }
 
-    public static
     @State.STATE
-    int getPortletState(Context context, int id) {
+    public static int getPortletState(Context context, int id) {
         return PortletState.getInstance(context).getState(id);
     }
 
     private void checkForTermination() {
-        if (mPortal == null && mPortlets.isEmpty()) {
+        if (mPortal == null && portlets.isEmpty()) {
             stopSelf();
         }
     }
@@ -473,7 +597,6 @@ public class PortalManager extends ForegroundService implements WrapperLayout.On
     @Retention(RetentionPolicy.SOURCE)
     public @interface INTENT_TYPE {
     }
-
 
 
     public interface IntentType {

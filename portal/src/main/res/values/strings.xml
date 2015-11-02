@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">portal</string>
+    <string name="app_name">portal library</string>
+    <string name="overlay_permission_denied">Overlay permission denied</string>
+    <string name="overlay_permission_notification">The application needs "Draw over other apps" permission to work.</string>
+    <string name="overlay_permission_rationale">The app needs this permission for optimal performance</string>
+    <string name="overlay_permission_granted_notification">Permission granted, tap for awesomeness</string>
 </resources>

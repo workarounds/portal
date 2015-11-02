@@ -17,13 +17,13 @@ public abstract class ForegroundService extends Service {
     @Cargo
     int resultCode;
     @Cargo
-    Intent activityResult;
+    Intent resultIntent;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         FreighterForegroundService.Retriever retriever = FreighterForegroundService.retrieve(intent);
         if(retriever.hasRequestCode() && retriever.hasRequestCode()) {
-            onActivityResult(retriever.requestCode(-1), retriever.resultCode(-1), retriever.activityResult());
+            onActivityResult(retriever.requestCode(-1), retriever.resultCode(-1), retriever.resultIntent());
         }
         return super.onStartCommand(intent, flags, startId);
     }

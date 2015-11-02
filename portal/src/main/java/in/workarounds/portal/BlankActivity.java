@@ -66,7 +66,7 @@ public class BlankActivity extends AppCompatActivity {
             intent.putExtras(FreighterForegroundService.supply()
                             .requestCode(requestCode)
                             .resultCode(resultCode)
-                            .activityResult(data)
+                            .resultIntent(data)
                             .bundle()
             );
             startService(intent);
