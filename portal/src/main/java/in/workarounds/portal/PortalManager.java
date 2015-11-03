@@ -14,6 +14,7 @@ import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -168,6 +169,8 @@ public class PortalManager extends ForegroundService implements WrapperLayout.On
     protected Notification getForegroundNotification() {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.ic_notification_icon)
+                .setPriority(NotificationCompat.PRIORITY_MIN)
+                .setColor(ContextCompat.getColor(this, R.color.portal_foreground_notification))
                 .setContentTitle(getString(R.string.app_name))
                 .setContentText(getString(R.string.foreground_notification));
         PendingIntent deleteIntent = PendingIntent.getService(
@@ -189,6 +192,7 @@ public class PortalManager extends ForegroundService implements WrapperLayout.On
                         .setAutoCancel(true)
                         .setSmallIcon(R.drawable.ic_notification_icon)
                         .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        .setColor(ContextCompat.getColor(this, R.color.portal_permission_notification))
                         .setVibrate(new long[0]) //mandatory for high priority,setting no vibration
                         .setContentTitle(getString(R.string.app_name))
                         .setContentText(getString(R.string.overlay_permission_granted_notification));
@@ -312,6 +316,7 @@ public class PortalManager extends ForegroundService implements WrapperLayout.On
                         .setAutoCancel(true)
                         .setSmallIcon(R.drawable.ic_notification_icon)
                         .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        .setColor(ContextCompat.getColor(this, R.color.portal_permission_notification))
                         .setVibrate(new long[0]) //mandatory for high priority,setting no vibration
                         .setContentTitle(getString(R.string.app_name))
                         .setContentText(getString(R.string.overlay_permission_notification));
