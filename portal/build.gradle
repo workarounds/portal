@@ -33,7 +33,7 @@ ext {
     siteUrl = 'https://github.com/workarounds/portal'
     gitUrl = 'https://github.com/workarounds/portal.git'
 
-    libraryVersion = '0.0.8'
+    libraryVersion = '0.0.9'
 
     developerId = 'workarounds'
     developerName = 'Workarounds'
