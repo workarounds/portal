@@ -1,4 +1,4 @@
-package in.workarounds.portal;
+package in.workarounds.portal.util;
 
 import android.view.Gravity;
 import android.view.WindowManager;

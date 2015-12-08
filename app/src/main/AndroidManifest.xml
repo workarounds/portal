@@ -19,11 +19,11 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name="in.workarounds.portal.PortalManager"
+        <serviceClass
+            android:name="in.workarounds.portal.SimplePortalService"
             android:enabled="true"
             android:exported="false" >
-        </service>
+        </serviceClass>
 
     </application>
 

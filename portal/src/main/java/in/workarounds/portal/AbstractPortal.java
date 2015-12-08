@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
+import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.IdRes;
@@ -19,6 +20,8 @@ import android.widget.FrameLayout;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+import in.workarounds.portal.util.ParamUtils;
+
 /**
  * Created by madki on 16/09/15.
  */
@@ -30,7 +33,9 @@ public abstract class AbstractPortal extends ContextWrapper {
     public static final int STATE_HIDDEN = 1;
     public static final int STATE_ACTIVE = 2;
 
-    protected @PORTAL_STATE int mState = STATE_HIDDEN;
+    protected
+    @PORTAL_STATE
+    int mState = STATE_HIDDEN;
     protected View mView;
 
     public AbstractPortal(Context base) {
@@ -65,7 +70,22 @@ public abstract class AbstractPortal extends ContextWrapper {
      * @return the layout params to be used while attaching the Portal to window
      */
     @NonNull
-    protected abstract WindowManager.LayoutParams getLayoutParams();
+    protected WindowManager.LayoutParams getLayoutParams() {
+        if (mView.getLayoutParams() instanceof WindowManager.LayoutParams) {
+            return (WindowManager.LayoutParams) mView.getLayoutParams();
+        } else {
+            WindowManager.LayoutParams params = new WindowManager.LayoutParams();
+            params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
+            params.flags = params.flags | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                    | WindowManager.LayoutParams.FLAG_SPLIT_TOUCH;
+            params.format = PixelFormat.TRANSLUCENT;
+
+            FrameLayout.LayoutParams viewParams = (FrameLayout.LayoutParams) mView.getLayoutParams();
+
+            ParamUtils.transferMarginAndGravity(params, viewParams);
+            return params;
+        }
+    }
 
     /**
      * @return the inflated view of the portal
@@ -97,7 +117,7 @@ public abstract class AbstractPortal extends ContextWrapper {
     }
 
     public abstract void finish();
-    public abstract void setPortalManager(PortalManager portalManager);
+
 
     @IntDef({STATE_HIDDEN, STATE_ACTIVE})
     @Retention(RetentionPolicy.SOURCE)

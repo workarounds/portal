@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -87,14 +86,12 @@ public class TestPortal extends Portal implements View.OnClickListener {
                 Intent pickContactIntent = new Intent(Intent.ACTION_PICK, Uri.parse("content://contacts"));
                 pickContactIntent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE); // Show user only contacts w/ phone numbers
                 startActivityForResult(pickContactIntent, PICK_CONTACT_REQUEST);
-                Portal.with(this).hide();
                 break;
         }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Portal.with(this).show();
         // Check which request we're responding to
         if (requestCode == PICK_CONTACT_REQUEST) {
             Log.d(TAG, "result received");
@@ -109,7 +106,6 @@ public class TestPortal extends Portal implements View.OnClickListener {
                 Log.d(TAG, "result cancelled");
             } else  if(resultCode == RESULT_DESTROYED) {
                 Log.d(TAG, "result destroyed");
-                Portal.with(this).close();
             }
         }
     }

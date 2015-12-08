@@ -38,7 +38,7 @@
             android:id="@+id/btn_close_service"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Close service" />
+            android:text="Close serviceClass" />
 
         <Button
             android:id="@+id/btn_activity_for_result"
