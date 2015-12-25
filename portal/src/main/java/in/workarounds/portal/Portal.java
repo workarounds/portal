@@ -1,6 +1,5 @@
 package in.workarounds.portal;
 
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
@@ -106,58 +105,4 @@ public class Portal extends AbstractPortal {
         ((WrapperLayout) getView()).removeOnCloseDialogsListener(listener);
     }
 
-
-    public static Manager manager(@NonNull Context context, @NonNull Class<? extends Service> serviceClass) {
-        return new Manager(context, serviceClass);
-    }
-
-    public static class Manager {
-        private Context context;
-        private Class<?> serviceClass;
-
-        private Manager(@NonNull Context context, @NonNull Class<? extends Service> serviceClass) {
-            this.context = context.getApplicationContext();
-            this.serviceClass = serviceClass;
-        }
-
-        private Intent getIntent() {
-            return new Intent(context, serviceClass);
-        }
-
-        public void openPortal(int portalId) {
-            context.startService(getIntent().putExtras(IntentResolver.openPortal(portalId)));
-        }
-
-        public void showPortal(int portalId) {
-            context.startService(getIntent().putExtras(IntentResolver.showPortal(portalId)));
-        }
-
-        public void hidePortal(int portalId) {
-            context.startService(getIntent().putExtras(IntentResolver.hidePortal(portalId)));
-        }
-
-        public void closePortal(int portalId) {
-            context.startService(getIntent().putExtras(IntentResolver.closePortal(portalId)));
-        }
-
-        public void sendPortal(int portalId, Bundle data) {
-            context.startService(getIntent().putExtras(IntentResolver.sendPortal(portalId, data)));
-        }
-
-        public void closeManager() {
-            context.startService(getIntent().putExtras(IntentResolver.closeManager()));
-        }
-
-        public void sendToAll(@NonNull Bundle data) {
-            context.startService(getIntent().putExtras(IntentResolver.sendToAll(data)));
-        }
-
-        public Class<?> getServiceClass() {
-            return serviceClass;
-        }
-
-        public void setServiceClass(Class<?> serviceClass) {
-            this.serviceClass = serviceClass;
-        }
-    }
 }

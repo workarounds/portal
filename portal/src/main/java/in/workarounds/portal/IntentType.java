@@ -14,4 +14,7 @@ public interface IntentType {
     int CLOSE_MANAGER = 100;
     int SEND_TO_ALL = 101;
     int ACTIVITY_RESULT = 102;
+
+    int START_ACTIVITY_FOR_RESULT = 110;
+
 }

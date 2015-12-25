@@ -12,7 +12,7 @@
             android:exported="false" />
 
         <activity
-            android:name=".BlankActivity"
+            android:name=".activity.BlankActivity"
             android:excludeFromRecents="true"
             android:theme="@style/TransparentActivity" />
     </application>

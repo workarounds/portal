@@ -1,8 +1,10 @@
-package in.workarounds.portal;
+package in.workarounds.portal.adapter;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+
+import in.workarounds.portal.Portal;
 
 /**
  * Created by madki on 29/11/15.

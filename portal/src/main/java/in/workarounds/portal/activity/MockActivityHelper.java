@@ -1,11 +1,12 @@
-package in.workarounds.portal;
+package in.workarounds.portal.activity;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
 import in.workarounds.bundler.annotations.Arg;
 import in.workarounds.bundler.annotations.RequireBundler;
+import in.workarounds.portal.Bundler;
+import in.workarounds.portal.IntentResolver;
 
 import static in.workarounds.portal.IntentType.ACTIVITY_RESULT;
 import static in.workarounds.portal.IntentType.NO_TYPE;
@@ -14,7 +15,7 @@ import static in.workarounds.portal.IntentType.NO_TYPE;
  * Created by madki on 29/11/15.
  */
 @RequireBundler
-public class ActivityHelper<T extends Context & ActivityResultListener> {
+public class MockActivityHelper implements IntentResolver {
     @Arg
     int intentType;
     @Arg
@@ -24,20 +25,21 @@ public class ActivityHelper<T extends Context & ActivityResultListener> {
     @Arg
     Intent activityResult;
 
-    private T activityResultListener;
+    private MockActivity mockActivity;
 
-    public ActivityHelper(T activityResultListener) {
-        this.activityResultListener = activityResultListener;
+    public MockActivityHelper(MockActivity mockActivity) {
+        this.mockActivity = mockActivity;
     }
 
-    public boolean onStartCommand(Intent intent) {
+    @Override
+    public boolean handleCommand(Intent intent) {
         if (intent == null) return false;
 
         resetFields();
         Bundler.inject(this, intent.getExtras());
 
         if (intentType == ACTIVITY_RESULT) {
-            activityResultListener.onActivityResult(requestCode, resultCode, activityResult);
+            mockActivity.onActivityResult(requestCode, resultCode, activityResult);
             return true;
         }
 
@@ -46,19 +48,19 @@ public class ActivityHelper<T extends Context & ActivityResultListener> {
 
     public void startActivity(Intent intent) {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        activityResultListener.startActivity(intent);
+        mockActivity.startActivity(intent);
     }
 
     public void startActivityForResult(Intent intent, int requestCode) {
         Intent blankActivityIntent = Bundler.blankActivity(
-                activityResultListener.getClass().getName(),
+                mockActivity.getClass().getName(),
                 requestCode,
                 intent
-        ).intent(activityResultListener);
+        ).intent(mockActivity.getContext());
 
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-        activityResultListener.startActivity(blankActivityIntent);
+        mockActivity.startActivity(blankActivityIntent);
     }
 
     private void resetFields() {
@@ -69,7 +71,7 @@ public class ActivityHelper<T extends Context & ActivityResultListener> {
     }
 
     public static Bundle activityResult(int requestCode, int resultCode, Intent activityResult) {
-        return Bundler.activityStarterHelper(ACTIVITY_RESULT, requestCode, resultCode, activityResult)
+        return Bundler.mockActivityHelper(ACTIVITY_RESULT, requestCode, resultCode, activityResult)
                 .bundle();
     }
 
