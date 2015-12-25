@@ -9,7 +9,6 @@ import android.util.Log;
 
 import in.workarounds.portal.activity.MockActivity;
 import in.workarounds.portal.activity.MockActivityHelper;
-import in.workarounds.portal.adapter.PortalAdapter;
 import in.workarounds.portal.permission.PermissionHelper;
 
 /**

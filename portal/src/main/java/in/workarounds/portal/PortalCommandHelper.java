@@ -9,7 +9,6 @@ import in.workarounds.bundler.annotations.Arg;
 import in.workarounds.bundler.annotations.OptionsForBundler;
 import in.workarounds.bundler.annotations.RequireBundler;
 import in.workarounds.bundler.annotations.Required;
-import in.workarounds.portal.adapter.BasePortalAdapter;
 import in.workarounds.portal.permission.IPermissionHelper;
 
 import static in.workarounds.portal.IntentType.CLOSE;
@@ -34,10 +33,10 @@ public class PortalCommandHelper implements IntentResolver {
     @Arg
     Bundle data;
 
-    private BasePortalAdapter portalAdapter;
+    private PortalAdapter portalAdapter;
     private IPermissionHelper permissionHelper;
 
-    public PortalCommandHelper(BasePortalAdapter portalAdapter, IPermissionHelper permissionHelper) {
+    public PortalCommandHelper(PortalAdapter portalAdapter, IPermissionHelper permissionHelper) {
         this.portalAdapter = portalAdapter;
         this.permissionHelper = permissionHelper;
     }

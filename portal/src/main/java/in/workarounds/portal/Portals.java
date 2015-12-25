@@ -10,6 +10,10 @@ import android.support.annotation.NonNull;
  */
 public class Portals {
 
+    protected Portals() {
+        throw new AssertionError("No instantiation");
+    }
+
     private static Intent getIntent(Context context, Class<?> serviceClass) {
         return new Intent(context, serviceClass);
     }
