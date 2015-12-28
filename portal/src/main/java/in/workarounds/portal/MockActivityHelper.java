@@ -1,29 +1,33 @@
-package in.workarounds.portal.activity;
+package in.workarounds.portal;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import in.workarounds.bundler.annotations.Arg;
 import in.workarounds.bundler.annotations.RequireBundler;
-import in.workarounds.portal.Bundler;
-import in.workarounds.portal.IntentResolver;
+import in.workarounds.bundler.annotations.Required;
 
 import static in.workarounds.portal.IntentType.ACTIVITY_RESULT;
 import static in.workarounds.portal.IntentType.NO_TYPE;
+import static in.workarounds.portal.IntentType.START_ACTIVITY_FOR_RESULT;
 
 /**
  * Created by madki on 29/11/15.
  */
-@RequireBundler
+@RequireBundler(requireAll = false)
 public class MockActivityHelper implements IntentResolver {
-    @Arg
+    private static final String TAG = "MockActivityHelper";
+    @Arg @Required
     int intentType;
-    @Arg
+    @Arg @Required
     int requestCode;
     @Arg
     int resultCode;
     @Arg
     Intent activityResult;
+    @Arg
+    Intent activityIntent;
 
     private MockActivity mockActivity;
 
@@ -33,6 +37,7 @@ public class MockActivityHelper implements IntentResolver {
 
     @Override
     public boolean handleCommand(Intent intent) {
+        Log.i(TAG, "handleCommand: ");
         if (intent == null) return false;
 
         resetFields();
@@ -40,6 +45,12 @@ public class MockActivityHelper implements IntentResolver {
 
         if (intentType == ACTIVITY_RESULT) {
             mockActivity.onActivityResult(requestCode, resultCode, activityResult);
+            return true;
+        } else if(intentType == START_ACTIVITY_FOR_RESULT) {
+            if(requestCode == -1) {
+                Log.e("MockActivityHelper", "requestId is not provided for startActivityForResult using default -1");
+            }
+            mockActivity.startActivityForResult(activityIntent, requestCode);
             return true;
         }
 
@@ -68,11 +79,18 @@ public class MockActivityHelper implements IntentResolver {
         requestCode = -1;
         resultCode = -10;
         activityResult = null;
+        activityIntent = null;
     }
 
-    public static Bundle activityResult(int requestCode, int resultCode, Intent activityResult) {
-        return Bundler.mockActivityHelper(ACTIVITY_RESULT, requestCode, resultCode, activityResult)
+    public static Bundle deliverActivityResult(int requestCode, int resultCode, Intent activityResult) {
+        return Bundler.mockActivityHelper(ACTIVITY_RESULT, requestCode)
+                .resultCode(resultCode).activityResult(activityResult)
                 .bundle();
+    }
+
+    public static Bundle startActivityForResultBundle(Intent activityIntent, int requestCode) {
+        return Bundler.mockActivityHelper(START_ACTIVITY_FOR_RESULT, requestCode)
+                .activityIntent(activityIntent).bundle();
     }
 
 }

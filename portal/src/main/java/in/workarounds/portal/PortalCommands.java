@@ -4,12 +4,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import in.workarounds.bundler.annotations.Arg;
 import in.workarounds.bundler.annotations.OptionsForBundler;
 import in.workarounds.bundler.annotations.RequireBundler;
 import in.workarounds.bundler.annotations.Required;
-import in.workarounds.portal.permission.IPermissionHelper;
 
 import static in.workarounds.portal.IntentType.CLOSE;
 import static in.workarounds.portal.IntentType.CLOSE_MANAGER;
@@ -25,7 +25,8 @@ import static in.workarounds.portal.IntentType.SHOW;
  */
 @OptionsForBundler(packageName = "in.workarounds.portal")
 @RequireBundler(requireAll = false)
-public class PortalCommandHelper implements IntentResolver {
+class PortalCommands implements IntentResolver {
+    private static final String TAG = "PortalCommands";
     @Arg @Required
     int intentType = NO_TYPE;
     @Arg
@@ -34,11 +35,9 @@ public class PortalCommandHelper implements IntentResolver {
     Bundle data;
 
     private PortalAdapter portalAdapter;
-    private IPermissionHelper permissionHelper;
 
-    public PortalCommandHelper(PortalAdapter portalAdapter, IPermissionHelper permissionHelper) {
+    public PortalCommands(PortalAdapter portalAdapter) {
         this.portalAdapter = portalAdapter;
-        this.permissionHelper = permissionHelper;
     }
 
     /**
@@ -49,19 +48,16 @@ public class PortalCommandHelper implements IntentResolver {
      */
     @Override
     public boolean handleCommand(@Nullable Intent intent) {
+        Log.i(TAG, "handleCommand: ");
         if(intent == null) return false;
 
         resetFields();
         // injects fields annotated with @Arg
         Bundler.inject(this, intent.getExtras());
 
-        if (permissionHelper != null && (intentType == OPEN || intentType == SHOW) && permissionHelper.requiresPermissionPrompt()) {
-            permissionHelper.promptForPermission(intent);
-        }
-
         switch (intentType) {
             case OPEN:
-                portalAdapter.open(portalId);
+                portalAdapter.open(portalId, data);
                 return true;
             case CLOSE:
                 portalAdapter.close(portalId);
@@ -98,31 +94,31 @@ public class PortalCommandHelper implements IntentResolver {
     }
 
     public static Bundle open(int portalId) {
-        return Bundler.portalCommandHelper(OPEN).portalId(portalId).bundle();
+        return Bundler.portalCommands(OPEN).portalId(portalId).bundle();
     }
 
     public static Bundle close(int portalId) {
-        return Bundler.portalCommandHelper(CLOSE).portalId(portalId).bundle();
+        return Bundler.portalCommands(CLOSE).portalId(portalId).bundle();
     }
 
     public static Bundle show(int portalId) {
-        return Bundler.portalCommandHelper(SHOW).portalId(portalId).bundle();
+        return Bundler.portalCommands(SHOW).portalId(portalId).bundle();
     }
 
     public static Bundle hide(int portalId) {
-        return Bundler.portalCommandHelper(HIDE).portalId(portalId).bundle();
+        return Bundler.portalCommands(HIDE).portalId(portalId).bundle();
     }
 
     public static Bundle send(int portalId, Bundle data) {
-        return Bundler.portalCommandHelper(SEND).portalId(portalId).data(data).bundle();
+        return Bundler.portalCommands(SEND).portalId(portalId).data(data).bundle();
     }
 
     public static Bundle closeManager() {
-        return Bundler.portalCommandHelper(CLOSE_MANAGER).bundle();
+        return Bundler.portalCommands(CLOSE_MANAGER).bundle();
     }
 
     public static Bundle sendToAll(@NonNull Bundle data) {
-        return Bundler.portalCommandHelper(SEND_TO_ALL).data(data).bundle();
+        return Bundler.portalCommands(SEND_TO_ALL).data(data).bundle();
     }
 
 

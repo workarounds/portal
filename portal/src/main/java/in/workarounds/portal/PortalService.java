@@ -7,32 +7,27 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import in.workarounds.portal.activity.MockActivity;
-import in.workarounds.portal.activity.MockActivityHelper;
-import in.workarounds.portal.permission.PermissionHelper;
-
 /**
  * Created by madki on 29/11/15.
  */
-public abstract class PortalService extends Service implements MockActivity {
+public abstract class PortalService<T extends PortalAdapter, P extends OverlayPermissionHelper> extends Service implements MockActivity, IPermissionManager {
     private static final String TAG = "PortalService";
     protected MockActivityHelper mockActivityHelper;
-    protected PortalCommandHelper portalCommandHelper;
-    protected PortalAdapter portalAdapter;
-    protected PermissionHelper permissionHelper;
+    protected T portalAdapter;
+    protected P permissionHelper;
 
     @Override
     public void onCreate() {
         super.onCreate();
         mockActivityHelper = new MockActivityHelper(this);
-        permissionHelper = new PermissionHelper(this);
+        permissionHelper = createPermissionHelper();
         portalAdapter = createPortalAdapter();
-        portalCommandHelper = new PortalCommandHelper(portalAdapter, permissionHelper);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if(mockActivityHelper.handleCommand(intent) || portalCommandHelper.handleCommand(intent)) {
+        Log.i(TAG, "onStartCommand: ");
+        if(mockActivityHelper.handleCommand(intent) || portalAdapter.handleCommand(intent)) {
             return START_STICKY;
         } else {
             Log.w(TAG, "Unknown intentType in handleCommand");
@@ -40,13 +35,15 @@ public abstract class PortalService extends Service implements MockActivity {
         return super.onStartCommand(intent, flags, startId);
     }
 
+    protected abstract T createPortalAdapter();
+    protected abstract P createPermissionHelper();
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return null;
     }
 
-    protected abstract PortalAdapter createPortalAdapter();
 
     @Override
     public void startActivity(Intent intent) {
@@ -61,7 +58,7 @@ public abstract class PortalService extends Service implements MockActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(!permissionHelper.onActivityResult(requestCode, resultCode, data)) {
+        if(!permissionHelper.onActivityResult(requestCode, resultCode, data) && !portalAdapter.onActivityResult(requestCode, resultCode, data)) {
             Log.w(TAG, "Unhandled activity result");
         }
     }
@@ -70,4 +67,5 @@ public abstract class PortalService extends Service implements MockActivity {
     public Context getContext() {
         return this;
     }
+
 }

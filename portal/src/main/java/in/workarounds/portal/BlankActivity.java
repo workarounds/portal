@@ -1,4 +1,4 @@
-package in.workarounds.portal.activity;
+package in.workarounds.portal;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 
 import in.workarounds.bundler.annotations.Arg;
 import in.workarounds.bundler.annotations.RequireBundler;
-import in.workarounds.portal.Bundler;
 
 /**
  * Created by madki on 29/10/15.
@@ -61,7 +60,7 @@ public class BlankActivity extends AppCompatActivity {
     private void sendToService(int requestCode, int resultCode, Intent data) {
         try {
             Intent intent = new Intent(this, Class.forName(className));
-            intent.putExtras(MockActivityHelper.activityResult(requestCode, resultCode, data));
+            intent.putExtras(MockActivityHelper.deliverActivityResult(requestCode, resultCode, data));
             startService(intent);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();

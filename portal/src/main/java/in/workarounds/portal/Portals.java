@@ -18,64 +18,64 @@ public class Portals {
         return new Intent(context, serviceClass);
     }
 
-    public static Intent openIntent(Context context, Class<?> serviceClass, int portalId) {
-        return getIntent(context, serviceClass).putExtras(PortalCommandHelper.open(portalId));
+    public static Intent openIntent(int portalId, Context context, Class<?> serviceClass) {
+        return getIntent(context, serviceClass).putExtras(PortalCommands.open(portalId));
     }
 
-    public static void open(Context context, Class<?> serviceClass, int portalId) {
-        context.startService(openIntent(context, serviceClass, portalId));
+    public static void open(int portalId, Context context, Class<?> serviceClass) {
+        context.startService(openIntent(portalId, context, serviceClass));
     }
 
-    public static Intent showIntent(Context context, Class<?> serviceClass, int portalId) {
-        return getIntent(context, serviceClass).putExtras(PortalCommandHelper.show(portalId));
+    public static Intent showIntent(int portalId, Context context, Class<?> serviceClass) {
+        return getIntent(context, serviceClass).putExtras(PortalCommands.show(portalId));
     }
 
-    public static void show(Context context, Class<?> serviceClass, int portalId) {
-        context.startService(showIntent(context, serviceClass, portalId));
+    public static void show(int portalId, Context context, Class<?> serviceClass) {
+        context.startService(showIntent(portalId, context, serviceClass));
     }
 
-    public static Intent hideIntent(Context context, Class<?> serviceClass, int portalId) {
-        return getIntent(context, serviceClass).putExtras(PortalCommandHelper.hide(portalId));
+    public static Intent hideIntent(int portalId, Context context, Class<?> serviceClass) {
+        return getIntent(context, serviceClass).putExtras(PortalCommands.hide(portalId));
     }
 
-    public static void hide(Context context, Class<?> serviceClass, int portalId) {
-        context.startService(hideIntent(context, serviceClass, portalId));
+    public static void hide(int portalId, Context context, Class<?> serviceClass) {
+        context.startService(hideIntent(portalId, context, serviceClass));
     }
 
-    public static Intent closeIntent(Context context, Class<?> serviceClass, int portalId) {
-        return getIntent(context, serviceClass).putExtras(PortalCommandHelper.close(portalId));
+    public static Intent closeIntent(int portalId, Context context, Class<?> serviceClass) {
+        return getIntent(context, serviceClass).putExtras(PortalCommands.close(portalId));
     }
 
-    public static void close(Context context, Class<?> serviceClass, int portalId) {
-        context.startService(closeIntent(context, serviceClass, portalId));
+    public static void close(int portalId, Context context, Class<?> serviceClass) {
+        context.startService(closeIntent(portalId, context, serviceClass));
     }
 
-    public static Intent sendIntent(Context context, Class<?> serviceClass, int portalId, Bundle data) {
-        return getIntent(context, serviceClass).putExtras(PortalCommandHelper.send(portalId, data));
+    public static Intent sendIntent(int portalId, Bundle data, Context context, Class<?> serviceClass) {
+        return getIntent(context, serviceClass).putExtras(PortalCommands.send(portalId, data));
     }
 
-    public static void send(Context context, Class<?> serviceClass, int portalId, Bundle data) {
-        context.startService(sendIntent(context, serviceClass, portalId, data));
+    public static void send(int portalId, Bundle data, Context context, Class<?> serviceClass) {
+        context.startService(sendIntent(portalId, data, context, serviceClass));
     }
 
     public static Intent closeManagerIntent(Context context, Class<?> serviceClass) {
-        return getIntent(context, serviceClass).putExtras(PortalCommandHelper.closeManager());
+        return getIntent(context, serviceClass).putExtras(PortalCommands.closeManager());
     }
 
     public static void closeManager(Context context, Class<?> serviceClass) {
         context.startService(closeManagerIntent(context, serviceClass));
     }
 
-    public static Intent sendToAllIntent(Context context, Class<?> serviceClass, @NonNull Bundle data) {
-        return getIntent(context, serviceClass).putExtras(PortalCommandHelper.sendToAll(data));
+    public static Intent sendToAllIntent(@NonNull Bundle data, Context context, Class<?> serviceClass) {
+        return getIntent(context, serviceClass).putExtras(PortalCommands.sendToAll(data));
     }
 
-    public static void sendToAll(Context context, Class<?> serviceClass, @NonNull Bundle data) {
-        context.startService(sendToAllIntent(context, serviceClass, data));
+    public static void sendToAll(@NonNull Bundle data, Context context, Class<?> serviceClass) {
+        context.startService(sendToAllIntent(data, context, serviceClass));
     }
 
-    public static Intent startActivityForResultIntent(Context context, Class<?> serviceClass, Intent activityIntent, int requestCode) {
+    public static Intent startActivityForResultIntent(Intent activityIntent, int requestCode, Context context, Class<?> serviceClass) {
         return getIntent(context, serviceClass)
-                .putExtras(CommandHelper.startActivityForResult(activityIntent, requestCode));
+                .putExtras(MockActivityHelper.startActivityForResultBundle(activityIntent, requestCode));
     }
 }

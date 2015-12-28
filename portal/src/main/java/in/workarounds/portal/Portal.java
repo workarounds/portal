@@ -1,108 +1,104 @@
 package in.workarounds.portal;
 
 import android.content.Context;
-import android.content.Intent;
+import android.content.ContextWrapper;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
-import android.support.annotation.CallSuper;
+import android.support.annotation.IdRes;
+import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
-import android.view.Gravity;
+import android.support.annotation.Nullable;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
-import in.workarounds.portal.util.ParamUtils;
-
 /**
  * Created by madki on 16/09/15.
  */
-public class Portal extends AbstractPortal {
-    protected boolean mRootAdded;
+public class Portal extends ContextWrapper {
+    protected View view;
+    protected final WindowManager windowManager;
 
     public Portal(Context base) {
         super(base);
+        windowManager = (WindowManager) base.getSystemService(WINDOW_SERVICE);
     }
 
-    @Override
-    protected void setContentView(View view) {
-        if (view instanceof WrapperLayout) {
-            super.setContentView(view);
-            mRootAdded = false;
-        } else {
-            WrapperLayout parent = new WrapperLayout(this);
-            parent.addView(view);
-            mRootAdded = true;
-            super.setContentView(parent);
-        }
+    protected void setContentView(@LayoutRes int layoutId) {
+        setContentView(LayoutInflater.from(this).cloneInContext(this).inflate(layoutId, new FrameLayout(this), false));
     }
 
-    @NonNull
-    @Override
+    protected void setContentView(@NonNull View view) {
+        this.view = view;
+    }
+
+    @Nullable
     protected WindowManager.LayoutParams getLayoutParams() {
-        if (mView.getLayoutParams() instanceof WindowManager.LayoutParams) {
-            return (WindowManager.LayoutParams) mView.getLayoutParams();
+        if (view == null) {
+            return null;
+        }
+
+        if (view.getLayoutParams() instanceof WindowManager.LayoutParams) {
+            return (WindowManager.LayoutParams) view.getLayoutParams();
         } else {
-            WindowManager.LayoutParams params = new WindowManager.LayoutParams();
-            params.type = WindowManager.LayoutParams.TYPE_PRIORITY_PHONE;
-            params.flags = params.flags | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
-            params.format = PixelFormat.TRANSLUCENT;
-
-            if (!mRootAdded) {
-                FrameLayout.LayoutParams viewParams = (FrameLayout.LayoutParams) mView.getLayoutParams();
-                ParamUtils.transferMarginAndGravity(params, viewParams);
-            } else {
-                params.gravity = Gravity.TOP;
-            }
-
+            WindowManager.LayoutParams params = portalLayoutParams();
+            FrameLayout.LayoutParams viewParams = (FrameLayout.LayoutParams) view.getLayoutParams();
+            ParamUtils.transferMarginAndGravity(params, viewParams);
             return params;
         }
     }
 
-    @Override
-    public void finish() {
+    @NonNull
+    protected WindowManager.LayoutParams portalLayoutParams() {
+        WindowManager.LayoutParams params = new WindowManager.LayoutParams();
+        params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
+        params.flags = params.flags | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                | WindowManager.LayoutParams.FLAG_SPLIT_TOUCH;
+        params.format = PixelFormat.TRANSLUCENT;
+        return params;
     }
 
-    public boolean onBackPressed() {
-        finish();
-        return true;
+    protected void onCreate(@Nullable Bundle bundle) {
     }
 
-    @Override
-    @CallSuper
-    protected void onCreate(Bundle bundle) {
-        super.onCreate(bundle);
+    public void attach() {
+        if(getView() != null && !(isViewAttached())) {
+            windowManager.addView(getView(), getLayoutParams());
+            onViewAttached();
+        }
     }
 
-    @Override
-    @CallSuper
-    protected void onResume() {
-        super.onResume();
+    protected void onViewAttached() {
+
     }
 
-    @Override
-    @CallSuper
-    protected void onPause() {
-        super.onPause();
+    protected void onDetachView() {
+
     }
 
-    @Override
-    @CallSuper
+    public void detach() {
+        if(isViewAttached()) {
+            onDetachView();
+            windowManager.removeView(getView());
+        }
+    }
+
     protected void onDestroy() {
-        super.onDestroy();
     }
 
-
-    @Override
-    public void startActivityForResult(Intent intent, int requestCode) {
-//        mSimplePortalService.startActivityForResult(intent, requestCode);
+    public View getView() {
+        return view;
     }
 
-    public void addOnCloseDialogsListener(WrapperLayout.OnCloseDialogsListener listener) {
-        ((WrapperLayout) getView()).addOnCloseDialogsListener(listener);
+    public boolean isViewAttached() {
+        return getView() != null && getView().getWindowToken() != null;
     }
 
-    public void removeOnCloseDialogsListener(WrapperLayout.OnCloseDialogsListener listener) {
-        ((WrapperLayout) getView()).removeOnCloseDialogsListener(listener);
+    @Nullable
+    public View findViewById(@IdRes int id) {
+        if(getView() == null) return null;
+        return getView().findViewById(id);
     }
 
 }

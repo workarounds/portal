@@ -1,4 +1,4 @@
-package in.workarounds.portal.permission;
+package in.workarounds.portal;
 
 import android.annotation.TargetApi;
 import android.app.Notification;
@@ -12,15 +12,10 @@ import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 
-import in.workarounds.portal.NotificationId;
-import in.workarounds.portal.Portals;
-import in.workarounds.portal.R;
-import in.workarounds.portal.activity.MockActivity;
-
 /**
  * Created by madki on 29/11/15.
  */
-public class PermissionHelper implements IPermissionHelper {
+public class OverlayPermissionHelper {
     public static final int OVERLAY_PERMISSION_REQUEST = 1001;
 
     private Context context;
@@ -28,27 +23,19 @@ public class PermissionHelper implements IPermissionHelper {
     private Intent queuedIntent = null;
     private NotificationManager notificationManager;
 
-    public PermissionHelper(MockActivity mockActivity) {
+    public OverlayPermissionHelper(MockActivity mockActivity) {
         this.context = mockActivity.getContext();
         this.mockActivity = mockActivity;
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
-    @Override
-    public boolean requiresPermissionPrompt() {
-        return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-                && !Settings.canDrawOverlays(context);
-    }
 
     @TargetApi(Build.VERSION_CODES.M)
-    @Override
     public void promptForPermission(Intent queuedIntent) {
         this.queuedIntent = queuedIntent;
         notificationManager.notify(NotificationId.PERMISSION_NOTIFICATION_ID, promptNotification());
     }
 
-    @Override
     public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == OVERLAY_PERMISSION_REQUEST) {
             if(resultCode == MockActivity.RESULT_OK) {
@@ -85,7 +72,7 @@ public class PermissionHelper implements IPermissionHelper {
         Intent activityIntent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                 Uri.parse("package:" + context.getPackageName()));
 
-        Intent clickIntent = Portals.startActivityForResultIntent(context, getServiceClass(), activityIntent, OVERLAY_PERMISSION_REQUEST);
+        Intent clickIntent = Portals.startActivityForResultIntent(activityIntent, OVERLAY_PERMISSION_REQUEST, context, getServiceClass());
 
         PendingIntent resultPendingIntent =
                 PendingIntent.getService(

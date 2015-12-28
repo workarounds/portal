@@ -26,7 +26,7 @@ public class CastingView extends View {
 
     private void testContext(Context context){
         if(context instanceof TestPortal){
-            Log.d("testing", "context is testportal");
+            Log.d("testing", "service is testportal");
         }
     }
 }

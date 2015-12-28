@@ -1,4 +1,4 @@
-package in.workarounds.portal.activity;
+package in.workarounds.portal;
 
 import android.app.Activity;
 import android.content.Context;

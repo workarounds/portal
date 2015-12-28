@@ -51,7 +51,7 @@ public class WrapperLayout extends FrameLayout {
     }
 
     public interface OnCloseDialogsListener {
-        void onCloseDialogs(@REASON int reason);
+        void onCloseDialogs(@IReason int reason);
     }
 
     @Override
@@ -74,7 +74,7 @@ public class WrapperLayout extends FrameLayout {
         }
     }
 
-    private void sendCallbackToListeners(@REASON int reason) {
+    private void sendCallbackToListeners(@IReason int reason) {
         if (listeners.size() > 0) {
             for (OnCloseDialogsListener listener : listeners) {
                 listener.onCloseDialogs(reason);
@@ -91,5 +91,5 @@ public class WrapperLayout extends FrameLayout {
 
     @Retention(SOURCE)
     @IntDef({KEY_BACK, KEY_HOME, KEY_RECENT_APPS, KEY_UNKNOWN})
-    public @interface REASON {}
+    public @interface IReason {}
 }
