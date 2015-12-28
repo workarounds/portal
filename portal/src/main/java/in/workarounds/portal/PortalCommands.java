@@ -93,8 +93,8 @@ class PortalCommands implements IntentResolver {
         data = Bundle.EMPTY;
     }
 
-    public static Bundle open(int portalId) {
-        return Bundler.portalCommands(OPEN).portalId(portalId).bundle();
+    public static Bundle open(int portalId, Bundle data) {
+        return Bundler.portalCommands(OPEN).portalId(portalId).data(data).bundle();
     }
 
     public static Bundle close(int portalId) {

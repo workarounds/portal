@@ -14,16 +14,16 @@ public class Portals {
         throw new AssertionError("No instantiation");
     }
 
-    private static Intent getIntent(Context context, Class<?> serviceClass) {
+    static Intent getIntent(Context context, Class<?> serviceClass) {
         return new Intent(context, serviceClass);
     }
 
-    public static Intent openIntent(int portalId, Context context, Class<?> serviceClass) {
-        return getIntent(context, serviceClass).putExtras(PortalCommands.open(portalId));
+    public static Intent openIntent(int portalId, Bundle data, Context context, Class<?> serviceClass) {
+        return getIntent(context, serviceClass).putExtras(PortalCommands.open(portalId, data));
     }
 
-    public static void open(int portalId, Context context, Class<?> serviceClass) {
-        context.startService(openIntent(portalId, context, serviceClass));
+    public static void open(int portalId, Bundle data, Context context, Class<?> serviceClass) {
+        context.startService(openIntent(portalId, data, context, serviceClass));
     }
 
     public static Intent showIntent(int portalId, Context context, Class<?> serviceClass) {

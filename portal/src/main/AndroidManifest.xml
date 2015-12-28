@@ -6,10 +6,6 @@
     <application
         android:allowBackup="true"
         android:label="@string/app_name">
-        <serviceClass
-            android:name=".SimplePortalService"
-            android:enabled="true"
-            android:exported="false" />
 
         <activity
             android:name=".BlankActivity"
