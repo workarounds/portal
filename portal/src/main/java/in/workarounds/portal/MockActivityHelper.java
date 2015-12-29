@@ -69,8 +69,6 @@ public class MockActivityHelper implements IntentResolver {
                 intent
         ).intent(mockActivity.getContext());
 
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
         mockActivity.startActivity(blankActivityIntent);
     }
 
