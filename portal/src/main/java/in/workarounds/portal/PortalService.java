@@ -3,6 +3,7 @@ package in.workarounds.portal;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -45,6 +46,11 @@ public abstract class PortalService<T extends PortalAdapter, P extends OverlayPe
         return null;
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        portalAdapter.onConfigurationChanged(newConfig);
+    }
 
     @Override
     public void startActivity(Intent intent) {

@@ -46,6 +46,15 @@ public class TestPortal extends Portal<TestService.MyPortalAdapter> implements V
         setContentView(R.layout.portal_test);
         Log.d(TAG, "onCreate called");
 
+
+        if(bundle != null) {
+            Toast.makeText(this, bundle.getString("key") + " onCreate", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    protected void onViewAttached() {
+        super.onViewAttached();
         ButterKnife.bind(this, getView());
         ButtonListener listener = new ButtonListener(this);
         openButton.setOnClickListener(listener);
@@ -56,9 +65,6 @@ public class TestPortal extends Portal<TestService.MyPortalAdapter> implements V
 
         activityForResultButton.setOnClickListener(this);
 
-        if(bundle != null) {
-            Toast.makeText(this, bundle.getString("key") + " onCreate", Toast.LENGTH_LONG).show();
-        }
     }
 
     @Override

@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -106,6 +107,15 @@ public abstract class PortalAdapter<S extends Service & IPermissionManager> impl
             if(getPortal(i) != null) canTerminate = false;
         }
         return canTerminate;
+    }
+
+    public void onConfigurationChanged(Configuration newConfig) {
+        for (int i=0; i < getCount(); i++) {
+            Portal portal = getPortal(i);
+            if(portal != null) {
+                portal.onConfigurationChanged(newConfig);
+            }
+        }
     }
 
     @Override

@@ -3,12 +3,14 @@ package in.workarounds.portal;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -18,9 +20,12 @@ import android.widget.FrameLayout;
  * Created by madki on 16/09/15.
  */
 public class Portal<T extends PortalAdapter> extends ContextWrapper {
+    private static final String TAG = "Portal";
     protected final T portalAdapter;
     protected View view;
     protected final WindowManager windowManager;
+    protected int layoutId = -1;
+    protected WindowManager.LayoutParams layoutParams;
 
     public Portal(Context base, T portalAdapter) {
         super(base);
@@ -29,26 +34,28 @@ public class Portal<T extends PortalAdapter> extends ContextWrapper {
     }
 
     protected void setContentView(@LayoutRes int layoutId) {
+        this.layoutId = layoutId;
         setContentView(LayoutInflater.from(this).cloneInContext(this).inflate(layoutId, new FrameLayout(this), false));
     }
 
     protected void setContentView(@NonNull View view) {
         this.view = view;
+        setLayoutParams(view);
     }
 
     @Nullable
     protected WindowManager.LayoutParams getLayoutParams() {
-        if (view == null) {
-            return null;
-        }
+        return layoutParams;
+    }
 
+    protected void setLayoutParams(View view) {
+        if(getView() == null) return;
         if (view.getLayoutParams() instanceof WindowManager.LayoutParams) {
-            return (WindowManager.LayoutParams) view.getLayoutParams();
+            layoutParams = (WindowManager.LayoutParams) view.getLayoutParams();
         } else {
-            WindowManager.LayoutParams params = portalLayoutParams();
+            layoutParams = portalLayoutParams();
             FrameLayout.LayoutParams viewParams = (FrameLayout.LayoutParams) view.getLayoutParams();
-            ParamUtils.transferMarginAndGravity(params, viewParams);
-            return params;
+            ParamUtils.transferMarginAndGravity(layoutParams, viewParams);
         }
     }
 
@@ -80,6 +87,17 @@ public class Portal<T extends PortalAdapter> extends ContextWrapper {
 
     protected void onViewAttached() {
 
+    }
+
+    public void onConfigurationChanged(Configuration newConfig) {
+        if(layoutId != -1) {
+            Log.d(TAG, "layoutId not null");
+            boolean detached = detach();
+            if(detached) Log.d(TAG, "detached");
+            else Log.d(TAG, "onConfigurationChanged: not detached");
+            setContentView(layoutId);
+            if(detached) attach();
+        }
     }
 
     protected void onDetachView() {

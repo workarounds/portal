@@ -2,9 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_gravity="left"
-    android:background="#ff1122"
+    android:layout_gravity="center_horizontal"
+    android:background="#ff112233"
     android:orientation="vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Yay turned" />
 
     <Button
         android:id="@+id/btn_open_portal"

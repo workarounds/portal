@@ -47,6 +47,15 @@ private static final String TAG = "TestMainPortal";
         setContentView(R.layout.portal_test);
         Log.d(TAG, "onCreate called");
 
+
+        if(data != null) {
+            Toast.makeText(this, data.getString("key") + " onCreate", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    protected void onViewAttached() {
+        super.onViewAttached();
         ButterKnife.bind(this, getView());
         ButtonListener listener = new ButtonListener(this);
         openButton.setOnClickListener(listener);
@@ -57,11 +66,7 @@ private static final String TAG = "TestMainPortal";
 
         activityForResultButton.setOnClickListener(this);
 
-        if(data != null) {
-            Toast.makeText(this, data.getString("key") + " onCreate", Toast.LENGTH_LONG).show();
-        }
     }
-
 
     @Override
     protected boolean onData(@Nullable Bundle data) {

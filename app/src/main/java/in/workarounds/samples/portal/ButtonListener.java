@@ -15,6 +15,7 @@ public class ButtonListener implements View.OnClickListener {
     private static final String TAG = "ButtonListener";
     private Context context;
     private EditText editText;
+    private static final int id = 1;
 
     public ButtonListener(Context context) {
         this.context = context;
@@ -35,19 +36,19 @@ public class ButtonListener implements View.OnClickListener {
         bundle.putString("key", "hi");
         switch (v.getId()) {
             case R.id.btn_open_portal:
-                Portals.open(1, bundle, context, TestService.class);
+                Portals.open(id, bundle, context, TestService.class);
                 break;
             case R.id.btn_show_portal:
-                Portals.show(1, context, TestService.class);
+                Portals.show(id, context, TestService.class);
                 break;
             case R.id.btn_hide_portal:
-                Portals.hide(1, context, TestService.class);
+                Portals.hide(id, context, TestService.class);
                 break;
             case R.id.btn_close_portal:
-                Portals.close(1, context, TestService.class);
+                Portals.close(id, context, TestService.class);
                 break;
             case R.id.btn_send_portal:
-                Portals.send(1, bundle, context, TestService.class);
+                Portals.send(id, bundle, context, TestService.class);
                 break;
             case R.id.btn_close_service:
                 Portals.closeManager(context, TestService.class);
