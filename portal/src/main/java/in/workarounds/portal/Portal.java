@@ -2,6 +2,7 @@ package in.workarounds.portal;
 
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
@@ -59,14 +60,20 @@ public class Portal extends ContextWrapper {
         return params;
     }
 
-    protected void onCreate(@Nullable Bundle bundle) {
+    protected void onCreate(@Nullable Bundle data) {
     }
 
-    public void attach() {
+    protected boolean onData(@Nullable Bundle data) {
+        return true;
+    }
+
+    public boolean attach() {
         if(getView() != null && !(isViewAttached())) {
             windowManager.addView(getView(), getLayoutParams());
             onViewAttached();
+            return true;
         }
+        return false;
     }
 
     protected void onViewAttached() {
@@ -77,11 +84,13 @@ public class Portal extends ContextWrapper {
 
     }
 
-    public void detach() {
+    public boolean detach() {
         if(isViewAttached()) {
             onDetachView();
             windowManager.removeView(getView());
+            return true;
         }
+        return false;
     }
 
     protected void onDestroy() {
@@ -99,6 +108,10 @@ public class Portal extends ContextWrapper {
     public View findViewById(@IdRes int id) {
         if(getView() == null) return null;
         return getView().findViewById(id);
+    }
+
+    public boolean onActivityResult(int requestCode, int resultCode, Intent result) {
+       return false;
     }
 
 }

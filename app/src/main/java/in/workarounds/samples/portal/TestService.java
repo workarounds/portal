@@ -27,7 +27,7 @@ public class TestService extends PortalService {
 
     }
 
-    public class MyPortalAdapter extends PortalAdapter<TestService> {
+    public static class MyPortalAdapter extends PortalAdapter<TestService> {
 
         public MyPortalAdapter(TestService service) {
             super(service);
@@ -43,9 +43,9 @@ public class TestService extends PortalService {
         protected Portal createPortal(int portalId) {
             switch (portalId) {
                 case 0:
-                    return new TestPortal(service);
+                    return new TestPortal(service, this);
                 case 1:
-                    return new TestPortal(service);
+                    return new TestPortal(service, this);
                 default:
                     throw new IndexOutOfBoundsException("given portalId exceeds count");
             }

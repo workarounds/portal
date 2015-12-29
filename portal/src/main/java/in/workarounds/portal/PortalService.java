@@ -27,7 +27,7 @@ public abstract class PortalService<T extends PortalAdapter, P extends OverlayPe
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "onStartCommand: ");
-        if(mockActivityHelper.handleCommand(intent) || portalAdapter.handleCommand(intent)) {
+        if (mockActivityHelper.handleCommand(intent) || portalAdapter.handleCommand(intent)) {
             return START_STICKY;
         } else {
             Log.w(TAG, "Unknown intentType in handleCommand");
@@ -36,6 +36,7 @@ public abstract class PortalService<T extends PortalAdapter, P extends OverlayPe
     }
 
     protected abstract T createPortalAdapter();
+
     protected abstract P createPermissionHelper();
 
     @Nullable
@@ -47,7 +48,7 @@ public abstract class PortalService<T extends PortalAdapter, P extends OverlayPe
 
     @Override
     public void startActivity(Intent intent) {
-        if(intent != null) intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        if (intent != null) intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         super.startActivity(intent);
     }
 
@@ -57,10 +58,14 @@ public abstract class PortalService<T extends PortalAdapter, P extends OverlayPe
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(!permissionHelper.onActivityResult(requestCode, resultCode, data) && !portalAdapter.onActivityResult(requestCode, resultCode, data)) {
-            Log.w(TAG, "Unhandled activity result");
+    public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (permissionHelper != null && permissionHelper.onActivityResult(requestCode, resultCode, data)) {
+            return true;
         }
+        if (portalAdapter.onActivityResult(requestCode, resultCode, data)) return true;
+
+        Log.w(TAG, "Unhandled activity result");
+        return false;
     }
 
     @Override

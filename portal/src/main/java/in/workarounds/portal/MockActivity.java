@@ -16,7 +16,7 @@ public interface MockActivity {
 
     void startActivityForResult(Intent intent, int requestCode);
 
-    void onActivityResult(int requestCode, int resultCode, Intent data);
+    boolean onActivityResult(int requestCode, int resultCode, Intent data);
 
     Context getContext();
 }

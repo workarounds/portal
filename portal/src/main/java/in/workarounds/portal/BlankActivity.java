@@ -3,6 +3,7 @@ package in.workarounds.portal;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import in.workarounds.bundler.annotations.Arg;
 import in.workarounds.bundler.annotations.RequireBundler;
@@ -26,6 +27,7 @@ public class BlankActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.i(TAG, "onCreate: ");
         firstTime = true;
         resultReceived = false;
 
@@ -37,6 +39,7 @@ public class BlankActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        Log.i(TAG, "onResume: ");
         if (!firstTime) {
             finish();
         } else {
@@ -47,11 +50,13 @@ public class BlankActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        Log.i(TAG, "onPause: ");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        Log.i(TAG, "onDestroy: ");
         if (!resultReceived) {
             sendToService(requestCode, MockActivity.RESULT_DESTROYED, null);
         }
@@ -70,6 +75,7 @@ public class BlankActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.i(TAG, "onActivityResult: requestCode: " + requestCode + ", resultCode " + resultCode);
         resultReceived = true;
         sendToService(requestCode, resultCode, data);
         finish();
