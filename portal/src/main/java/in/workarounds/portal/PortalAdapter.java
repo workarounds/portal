@@ -69,6 +69,7 @@ public abstract class PortalAdapter<S extends Service & IPermissionManager> impl
             portal.onDestroy();
         }
         portals.set(portalId, null);
+        checkForTemination();
         Log.i(TAG, "close: ");
     }
 
@@ -93,6 +94,18 @@ public abstract class PortalAdapter<S extends Service & IPermissionManager> impl
             send(i, data);
         }
         Log.i(TAG, "sendToAll: ");
+    }
+
+    public void checkForTemination() {
+        if(canTerminate()) service.stopSelf();
+    }
+
+    public boolean canTerminate() {
+        boolean canTerminate = true;
+        for(int i=0; i < getCount(); i++) {
+            if(getPortal(i) != null) canTerminate = false;
+        }
+        return canTerminate;
     }
 
     @Override
