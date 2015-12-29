@@ -17,12 +17,14 @@ import android.widget.FrameLayout;
 /**
  * Created by madki on 16/09/15.
  */
-public class Portal extends ContextWrapper {
+public class Portal<T extends PortalAdapter> extends ContextWrapper {
+    protected final T portalAdapter;
     protected View view;
     protected final WindowManager windowManager;
 
-    public Portal(Context base) {
+    public Portal(Context base, T portalAdapter) {
         super(base);
+        this.portalAdapter = portalAdapter;
         windowManager = (WindowManager) base.getSystemService(WINDOW_SERVICE);
     }
 
@@ -94,6 +96,14 @@ public class Portal extends ContextWrapper {
     }
 
     protected void onDestroy() {
+    }
+
+    public void finish() {
+        if(portalAdapter != null) {
+            portalAdapter.close(portalAdapter.indexOf(this));
+        } else {
+            detach();
+        }
     }
 
     public View getView() {

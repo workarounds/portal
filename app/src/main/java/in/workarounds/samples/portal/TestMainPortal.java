@@ -13,14 +13,14 @@ import android.widget.Toast;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import in.workarounds.portal.MainPortal;
 import in.workarounds.portal.MockActivity;
-import in.workarounds.portal.Portal;
 
 /**
- * Created by madki on 17/09/15.
+ * Created by madki on 29/12/15.
  */
-public class TestPortal extends Portal<TestService.MyPortalAdapter> implements View.OnClickListener {
-    private static final String TAG = "TestPortal";
+public class TestMainPortal extends MainPortal<TestService.MyPortalAdapter> implements View.OnClickListener {
+private static final String TAG = "TestMainPortal";
     private static final int PICK_CONTACT_REQUEST = 1;
 
     @Bind(R.id.btn_open_portal)
@@ -36,13 +36,14 @@ public class TestPortal extends Portal<TestService.MyPortalAdapter> implements V
     @Bind(R.id.btn_activity_for_result)
     Button activityForResultButton;
 
-    public TestPortal(Context base, TestService.MyPortalAdapter portalAdapter) {
+
+    public TestMainPortal(Context base, TestService.MyPortalAdapter portalAdapter) {
         super(base, portalAdapter);
     }
 
     @Override
-    protected void onCreate(Bundle bundle) {
-        super.onCreate(bundle);
+    protected void onCreate(@Nullable Bundle data) {
+        super.onCreate(data);
         setContentView(R.layout.portal_test);
         Log.d(TAG, "onCreate called");
 
@@ -56,10 +57,11 @@ public class TestPortal extends Portal<TestService.MyPortalAdapter> implements V
 
         activityForResultButton.setOnClickListener(this);
 
-        if(bundle != null) {
-            Toast.makeText(this, bundle.getString("key") + " onCreate", Toast.LENGTH_LONG).show();
+        if(data != null) {
+            Toast.makeText(this, data.getString("key") + " onCreate", Toast.LENGTH_LONG).show();
         }
     }
+
 
     @Override
     protected boolean onData(@Nullable Bundle data) {

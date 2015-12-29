@@ -48,8 +48,7 @@ public abstract class PortalService<T extends PortalAdapter, P extends OverlayPe
 
     @Override
     public void startActivity(Intent intent) {
-        if (intent != null) intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        super.startActivity(intent);
+        mockActivityHelper.startActivity(intent);
     }
 
     @Override

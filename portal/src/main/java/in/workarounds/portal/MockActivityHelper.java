@@ -18,9 +18,11 @@ import static in.workarounds.portal.IntentType.START_ACTIVITY_FOR_RESULT;
 @RequireBundler(requireAll = false)
 public class MockActivityHelper implements IntentResolver {
     private static final String TAG = "MockActivityHelper";
-    @Arg @Required
+    @Arg
+    @Required
     int intentType;
-    @Arg @Required
+    @Arg
+    @Required
     int requestCode;
     @Arg
     int resultCode;
@@ -46,8 +48,8 @@ public class MockActivityHelper implements IntentResolver {
         if (intentType == ACTIVITY_RESULT) {
             mockActivity.onActivityResult(requestCode, resultCode, activityResult);
             return true;
-        } else if(intentType == START_ACTIVITY_FOR_RESULT) {
-            if(requestCode == -1) {
+        } else if (intentType == START_ACTIVITY_FOR_RESULT) {
+            if (requestCode == -1) {
                 Log.e("MockActivityHelper", "requestId is not provided for startActivityForResult using default -1");
             }
             mockActivity.startActivityForResult(activityIntent, requestCode);

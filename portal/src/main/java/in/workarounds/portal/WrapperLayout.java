@@ -22,6 +22,7 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
  * Created by madki on 16/09/15.
  */
 public class WrapperLayout extends FrameLayout {
+    private static final String TAG = "WrapperLayout";
     private Set<OnCloseDialogsListener> listeners = new HashSet<>();
 
     public WrapperLayout(Context context) {
@@ -56,7 +57,10 @@ public class WrapperLayout extends FrameLayout {
 
     @Override
     public boolean dispatchKeyEvent(@NonNull KeyEvent event) {
-        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) sendCallbackToListeners(KEY_BACK);
+        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK
+                && event.getAction() == KeyEvent.ACTION_UP) {
+            sendCallbackToListeners(KEY_BACK);
+        }
         return super.dispatchKeyEvent(event);
     }
 

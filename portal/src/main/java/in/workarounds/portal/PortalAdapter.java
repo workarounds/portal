@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * Created by madki on 29/11/15.
  */
-public abstract class PortalAdapter<S extends Service & IPermissionManager> implements IntentResolver, WrapperLayout.OnCloseDialogsListener, MockActivity {
+public abstract class PortalAdapter<S extends Service & IPermissionManager> implements IntentResolver, MockActivity {
     private static final String TAG = "PortalAdapter";
     private PortalCommands portalCommands;
     protected List<Portal> portals;
@@ -52,20 +52,13 @@ public abstract class PortalAdapter<S extends Service & IPermissionManager> impl
             service.promptForPermission(Portals.showIntent(portalId, getContext(), service.getClass()));
             return;
         }
-
-        if (portal instanceof MainPortal) {
-            ((MainPortal) portal).addOnCloseDialogsListener(this);
-        }
-
         portal.attach();
         Log.i(TAG, "show: ");
     }
 
     public void hide(int portalId) {
         Portal portal = getPortal(portalId);
-        if (portal != null && portal.detach() && (portal instanceof MainPortal)) {
-            ((MainPortal) portal).removeOnCloseDialogsListener(this);
-        }
+        if (portal != null) portal.detach();
         Log.i(TAG, "hide: ");
     }
 
@@ -175,12 +168,7 @@ public abstract class PortalAdapter<S extends Service & IPermissionManager> impl
                 || Settings.canDrawOverlays(service);
     }
 
-    @Override
-    public void onCloseDialogs(@WrapperLayout.IReason int reason) {
-
-    }
-
-    public Context getContext() {
+   public Context getContext() {
         return service;
     }
 
