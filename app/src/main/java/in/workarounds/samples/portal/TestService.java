@@ -1,6 +1,5 @@
 package in.workarounds.samples.portal;
 
-import android.content.Intent;
 import android.support.annotation.NonNull;
 
 import in.workarounds.portal.OverlayPermissionHelper;
@@ -19,12 +18,22 @@ public class TestService extends PortalService {
 
     @Override
     protected OverlayPermissionHelper createPermissionHelper() {
-        return null;
-    }
+        return new OverlayPermissionHelper(this) {
+            @Override
+            protected String getAppName() {
+                return context.getString(R.string.app_name);
+            }
 
-    @Override
-    public void promptForPermission(Intent queuedIntent) {
+            @Override
+            protected int getAccentColor() {
+                return android.R.color.primary_text_dark;
+            }
 
+            @Override
+            protected int getNotificationIcon() {
+                return R.drawable.app_icon;
+            }
+        };
     }
 
     public static class MyPortalAdapter extends PortalAdapter<TestService> {

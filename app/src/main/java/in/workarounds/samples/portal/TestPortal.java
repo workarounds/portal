@@ -15,6 +15,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import in.workarounds.portal.MockActivity;
 import in.workarounds.portal.Portal;
+import in.workarounds.portal.Portals;
 
 /**
  * Created by madki on 17/09/15.
@@ -81,7 +82,8 @@ public class TestPortal extends Portal<TestService.MyPortalAdapter> implements V
             case R.id.btn_activity_for_result:
                 Intent pickContactIntent = new Intent(Intent.ACTION_PICK, Uri.parse("content://contacts"));
                 pickContactIntent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE); // Show user only contacts w/ phone numbers
-                portalAdapter.startActivityForResult(pickContactIntent, PICK_CONTACT_REQUEST);
+                startService(Portals.startActivityForResultIntent(pickContactIntent, PICK_CONTACT_REQUEST, this, TestService.class));
+//                portalAdapter.startActivityForResult(pickContactIntent, PICK_CONTACT_REQUEST);
                 break;
         }
     }

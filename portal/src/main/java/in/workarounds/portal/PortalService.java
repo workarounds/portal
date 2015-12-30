@@ -36,6 +36,11 @@ public abstract class PortalService<T extends PortalAdapter, P extends OverlayPe
         return super.onStartCommand(intent, flags, startId);
     }
 
+    @Override
+    public void promptForPermission(Intent queuedIntent) {
+        if(permissionHelper != null) permissionHelper.promptForPermission(queuedIntent);
+    }
+
     protected abstract T createPortalAdapter();
 
     protected abstract P createPermissionHelper();
@@ -54,7 +59,8 @@ public abstract class PortalService<T extends PortalAdapter, P extends OverlayPe
 
     @Override
     public void startActivity(Intent intent) {
-        mockActivityHelper.startActivity(intent);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        super.startActivity(intent);
     }
 
     @Override

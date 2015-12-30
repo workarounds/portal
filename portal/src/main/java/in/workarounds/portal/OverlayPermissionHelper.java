@@ -9,22 +9,25 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
+import android.support.annotation.ColorRes;
+import android.support.annotation.DrawableRes;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
+import android.widget.Toast;
 
 /**
  * Created by madki on 29/11/15.
  */
-public class OverlayPermissionHelper {
+public abstract class OverlayPermissionHelper {
     public static final int OVERLAY_PERMISSION_REQUEST = 1001;
 
-    private Context context;
-    private MockActivity mockActivity;
-    private Intent queuedIntent = null;
-    private NotificationManager notificationManager;
+    protected Context context;
+    protected MockActivity mockActivity;
+    protected Intent queuedIntent = null;
+    protected NotificationManager notificationManager;
 
     public OverlayPermissionHelper(MockActivity mockActivity) {
-        this.context = mockActivity.getContext();
+        this.context = mockActivity.getContext().getApplicationContext();
         this.mockActivity = mockActivity;
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
     }
@@ -37,8 +40,8 @@ public class OverlayPermissionHelper {
     }
 
     public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == OVERLAY_PERMISSION_REQUEST) {
-            if(resultCode == MockActivity.RESULT_OK) {
+        if (requestCode == OVERLAY_PERMISSION_REQUEST) {
+            if (hasOverlayPermission(context)) {
                 onPermissionApproved();
             } else {
                 onPermissionDenied();
@@ -49,57 +52,119 @@ public class OverlayPermissionHelper {
     }
 
     protected void onPermissionApproved() {
-        // TODO show notification with existing intent as pending intent
+        notificationManager.notify(NotificationId.APPROVED_NOTFICATION_ID, approvedNotification());
     }
 
     protected void onPermissionDenied() {
-        // TODO show toast
+        Portals.closeManager(context, getServiceClass());
+        Toast.makeText(context, "Draw over apps permission denied", Toast.LENGTH_LONG).show();
     }
 
 
     @TargetApi(Build.VERSION_CODES.M)
     protected Notification promptNotification() {
-        NotificationCompat.Builder builder =
-                new NotificationCompat.Builder(context)
-                        .setAutoCancel(true)
-                        .setSmallIcon(R.drawable.ic_notification_icon)
-                        .setPriority(NotificationCompat.PRIORITY_HIGH)
-                        .setColor(ContextCompat.getColor(context, R.color.portal_permission_notification))
-                        .setVibrate(new long[0]) //mandatory for high priority,setting no vibration
-                        .setContentTitle(context.getString(R.string.app_name))
-                        .setContentText(context.getString(R.string.overlay_permission_notification));
+        return preparePromptNotification(new NotificationCompat.Builder(context))
+                .setContentIntent(promptNotificationClick(NotificationId.PENDING_DRAW_OVER_APPS))
+                .setDeleteIntent(promptNotificationDelete(NotificationId.PENDING_DELETE_DRAW_OVER_APPS))
+                .build();
+    }
 
-        Intent activityIntent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                Uri.parse("package:" + context.getPackageName()));
+    protected NotificationCompat.Builder prepareNotification(NotificationCompat.Builder builder) {
+        return builder.setAutoCancel(true)
+                .setSmallIcon(getNotificationIcon())
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setVibrate(new long[0])
+                .setColor(ContextCompat.getColor(context, getAccentColor()));
+    }
 
-        Intent clickIntent = Portals.startActivityForResultIntent(activityIntent, OVERLAY_PERMISSION_REQUEST, context, getServiceClass());
+    protected NotificationCompat.Builder preparePromptNotification(NotificationCompat.Builder builder) {
+        return prepareNotification(builder)
+                .setContentTitle(getAppName())
+                .setContentText(context.getString(R.string.overlay_permission_notification));
+    }
 
-        PendingIntent resultPendingIntent =
-                PendingIntent.getService(
-                        context,
-                        NotificationId.PENDING_DRAW_OVER_APPS,
-                        clickIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT
-                );
+    @TargetApi(Build.VERSION_CODES.M)
+    protected Intent overlayPermissionActivity() {
+        return new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                Uri.parse("package:" + context.getPackageName())
+        );
+    }
 
-        PendingIntent deleteIntent = PendingIntent.getService(
+    protected Intent promptNotificationClick() {
+        return Portals.startActivityForResultIntent(
+                overlayPermissionActivity(),
+                OVERLAY_PERMISSION_REQUEST,
                 context,
-                NotificationId.PENDING_DELETE_DRAW_OVER_APPS,
-                Portals.closeManagerIntent(context, getServiceClass()),
+                getServiceClass()
+        );
+    }
+
+    protected PendingIntent promptNotificationClick(int notifId) {
+        return PendingIntent.getService(
+                context,
+                notifId,
+                promptNotificationClick(),
                 PendingIntent.FLAG_UPDATE_CURRENT
         );
+    }
 
-        builder.setContentIntent(resultPendingIntent);
-        builder.setDeleteIntent(deleteIntent);
-        return null;
+    protected Intent promptNotificationDelete() {
+        return Portals.closeManagerIntent(context, getServiceClass());
+    }
+
+    protected PendingIntent promptNotificationDelete(int notifId) {
+        return PendingIntent.getService(
+                context,
+                notifId,
+                promptNotificationDelete(),
+                PendingIntent.FLAG_UPDATE_CURRENT
+        );
     }
 
     protected Notification approvedNotification() {
-        return null;
+        return prepareApprovedNotification(new NotificationCompat.Builder(context))
+                .setContentIntent(approvedNotificationClick(NotificationId.PENDING_CLICK_APPROVED))
+                .setDeleteIntent(approvedNotificationDelete(NotificationId.PENDING_DELETE_APPROVED))
+                .build();
+    }
+
+    protected NotificationCompat.Builder prepareApprovedNotification(NotificationCompat.Builder builder) {
+        return prepareNotification(builder)
+                .setContentTitle(getAppName())
+                .setContentText("Permission approved. Click to continue");
+    }
+
+    protected PendingIntent approvedNotificationClick(int notifId) {
+        return PendingIntent.getService(
+                context,
+                notifId,
+                queuedIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT
+        );
+    }
+
+    protected PendingIntent approvedNotificationDelete(int notifId) {
+        return PendingIntent.getService(
+                context,
+                notifId,
+                Portals.closeManagerIntent(context, getServiceClass()),
+                PendingIntent.FLAG_UPDATE_CURRENT
+        );
     }
 
     protected Class<?> getServiceClass() {
         return mockActivity.getClass();
     }
 
+    protected abstract String getAppName();
+    @ColorRes
+    protected abstract int getAccentColor();
+    @DrawableRes
+    protected abstract int getNotificationIcon();
+
+    @TargetApi(Build.VERSION_CODES.M)
+    public static boolean hasOverlayPermission(Context context) {
+        return !(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                || Settings.canDrawOverlays(context);
+    }
 }

@@ -1,13 +1,10 @@
 package in.workarounds.portal;
 
-import android.annotation.TargetApi;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -49,7 +46,7 @@ public abstract class PortalAdapter<S extends Service & IPermissionManager> impl
         Portal portal = getPortal(portalId);
         if (portal == null || portal.getView() == null || portal.isViewAttached()) return;
 
-        if (!hasOverlayPermission()) {
+        if (!OverlayPermissionHelper.hasOverlayPermission(getContext())) {
             service.promptForPermission(Portals.showIntent(portalId, getContext(), service.getClass()));
             return;
         }
@@ -183,12 +180,6 @@ public abstract class PortalAdapter<S extends Service & IPermissionManager> impl
         if (portalId < 0 || portalId >= getCount()) {
             throw new IllegalArgumentException("Invalid portal Id: " + portalId);
         }
-    }
-
-    @TargetApi(Build.VERSION_CODES.M)
-    protected boolean hasOverlayPermission() {
-        return !(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-                || Settings.canDrawOverlays(service);
     }
 
    public Context getContext() {
