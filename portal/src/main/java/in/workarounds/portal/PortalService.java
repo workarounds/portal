@@ -7,6 +7,7 @@ import android.content.res.Configuration;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.widget.Toast;
 
 /**
  * Created by madki on 29/11/15.
@@ -65,6 +66,10 @@ public abstract class PortalService<T extends PortalAdapter, P extends OverlayPe
 
     @Override
     public void startActivityForResult(Intent intent, int requestCode) {
+        if(permissionHelper != null &&
+                requestCode == OverlayPermissionHelper.OVERLAY_PERMISSION_REQUEST) {
+            Toast.makeText(this, permissionHelper.getPermissionRationale(), Toast.LENGTH_LONG).show();
+        }
         mockActivityHelper.startActivityForResult(intent, requestCode);
     }
 

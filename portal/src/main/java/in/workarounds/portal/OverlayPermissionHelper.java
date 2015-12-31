@@ -57,7 +57,7 @@ public abstract class OverlayPermissionHelper {
 
     protected void onPermissionDenied() {
         Portals.closeManager(context, getServiceClass());
-        Toast.makeText(context, "Draw over apps permission denied", Toast.LENGTH_LONG).show();
+        Toast.makeText(context, "Draw over other apps permission denied", Toast.LENGTH_LONG).show();
     }
 
 
@@ -80,7 +80,7 @@ public abstract class OverlayPermissionHelper {
     protected NotificationCompat.Builder preparePromptNotification(NotificationCompat.Builder builder) {
         return prepareNotification(builder)
                 .setContentTitle(getAppName())
-                .setContentText(context.getString(R.string.overlay_permission_notification));
+                .setContentText("Draw over other apps permission required.");
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -166,5 +166,9 @@ public abstract class OverlayPermissionHelper {
     public static boolean hasOverlayPermission(Context context) {
         return !(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
                 || Settings.canDrawOverlays(context);
+    }
+
+    public String getPermissionRationale() {
+        return "The application " + getAppName() +" needs 'Draw over other apps' permission to work.";
     }
 }
