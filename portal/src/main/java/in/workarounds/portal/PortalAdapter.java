@@ -39,7 +39,6 @@ public abstract class PortalAdapter<S extends Service & IPermissionManager> impl
             send(portalId, data);
         }
         show(portalId);
-        Log.i(TAG, "open: ");
     }
 
     public void show(int portalId) {
@@ -51,13 +50,11 @@ public abstract class PortalAdapter<S extends Service & IPermissionManager> impl
             return;
         }
         portal.attach();
-        Log.i(TAG, "show: ");
     }
 
     public void hide(int portalId) {
         Portal portal = getPortal(portalId);
         if (portal != null) portal.detach();
-        Log.i(TAG, "hide: ");
     }
 
     public void close(int portalId) {
@@ -68,7 +65,6 @@ public abstract class PortalAdapter<S extends Service & IPermissionManager> impl
         }
         portals.set(portalId, null);
         checkForTemination();
-        Log.i(TAG, "close: ");
     }
 
     public void send(int portalId, Bundle data) {
@@ -172,7 +168,6 @@ public abstract class PortalAdapter<S extends Service & IPermissionManager> impl
 
     @Override
     public boolean handleCommand(@Nullable Intent intent) {
-        Log.i(TAG, "handleCommand: ");
         return portalCommands.handleCommand(intent);
     }
 

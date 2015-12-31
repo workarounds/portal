@@ -39,7 +39,6 @@ public class MockActivityHelper implements IntentResolver {
 
     @Override
     public boolean handleCommand(Intent intent) {
-        Log.i(TAG, "handleCommand: ");
         if (intent == null) return false;
 
         resetFields();

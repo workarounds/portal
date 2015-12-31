@@ -28,7 +28,6 @@ public abstract class PortalService<T extends PortalAdapter, P extends OverlayPe
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.i(TAG, "onStartCommand: ");
         if (mockActivityHelper.handleCommand(intent) || portalAdapter.handleCommand(intent)) {
             return START_STICKY;
         } else {
