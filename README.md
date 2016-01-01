@@ -5,7 +5,7 @@ Currently the apis are highly unstable and a lot of design changes are planned. 
 The library is hosted in jcenter
 gradle dependency:
 ```
-compile 'in.workarounds.portal:portal:0.0.9'
+compile 'in.workarounds.portal:portal:1.0.1'
 ```
 License
 -------
