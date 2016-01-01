@@ -54,8 +54,9 @@ private static final String TAG = "TestMainPortal";
     }
 
     @Override
-    protected void onViewAttached() {
-        super.onViewAttached();
+    protected void onViewCreated() {
+        super.onViewCreated();
+        Log.d(TAG, "onViewCreated: called");
         ButterKnife.bind(this, getView());
         ButtonListener listener = new ButtonListener(this);
         openButton.setOnClickListener(listener);

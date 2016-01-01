@@ -45,17 +45,16 @@ public class TestPortal extends Portal<TestService.MyPortalAdapter> implements V
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         setContentView(R.layout.portal_test);
-        Log.d(TAG, "onCreate called");
 
 
-        if(bundle != null) {
+        if (bundle != null) {
             Toast.makeText(this, bundle.getString("key") + " onCreate", Toast.LENGTH_LONG).show();
         }
     }
 
     @Override
-    protected void onViewAttached() {
-        super.onViewAttached();
+    protected void onViewCreated() {
+        super.onViewCreated();
         ButterKnife.bind(this, getView());
         ButtonListener listener = new ButtonListener(this);
         openButton.setOnClickListener(listener);
@@ -70,7 +69,7 @@ public class TestPortal extends Portal<TestService.MyPortalAdapter> implements V
 
     @Override
     protected boolean onData(@Nullable Bundle data) {
-        if(data != null) {
+        if (data != null) {
             Toast.makeText(this, data.getString("key") + " onData", Toast.LENGTH_LONG).show();
         }
         return false;
@@ -99,9 +98,9 @@ public class TestPortal extends Portal<TestService.MyPortalAdapter> implements V
                 // The Intent's data Uri identifies which contact was selected.
 
                 // Do something with the contact here (bigger example below)
-            } else if(resultCode == MockActivity.RESULT_CANCELLED) {
+            } else if (resultCode == MockActivity.RESULT_CANCELLED) {
                 Log.d(TAG, "result cancelled");
-            } else  if(resultCode == MockActivity.RESULT_DESTROYED) {
+            } else if (resultCode == MockActivity.RESULT_DESTROYED) {
                 Log.d(TAG, "result destroyed");
             }
             return true;

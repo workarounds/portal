@@ -18,15 +18,15 @@ public class MainPortal<T extends PortalAdapter> extends Portal<T> implements Wr
 
 
     @Override
-    protected void setContentView(@NonNull View view) {
-        if (!(view instanceof WrapperLayout)) {
+    protected void setContentView(View view) {
+        if (view != null && !(view instanceof WrapperLayout)) {
             WrapperLayout parent = new WrapperLayout(this);
             parent.addView(view);
-            this.view = parent;
+            setView(parent);
+            setLayoutParams(view);
         } else {
-            this.view = view;
+            super.setContentView(view);
         }
-        setLayoutParams(view);
     }
 
     @NonNull
@@ -45,22 +45,13 @@ public class MainPortal<T extends PortalAdapter> extends Portal<T> implements Wr
     @CallSuper
     protected void onViewAttached() {
         super.onViewAttached();
-        addOnCloseDialogsListener(this);
+        setAsListener();
     }
 
     @Override
     protected void onDetachView() {
         super.onDetachView();
-        removeOnCloseDialogsListener(this);
-    }
-
-    @Override
-    @NonNull
-    public View getView() {
-        if (super.getView() == null) {
-            throw new IllegalStateException("MainPortal has no view. Please call setContentView or use Portal if no view is needed.");
-        }
-        return super.getView();
+        removeAsListener();
     }
 
     protected boolean onBackPressed() {
@@ -97,11 +88,17 @@ public class MainPortal<T extends PortalAdapter> extends Portal<T> implements Wr
         }
     }
 
-    public void addOnCloseDialogsListener(WrapperLayout.OnCloseDialogsListener listener) {
-        ((WrapperLayout) getView()).addOnCloseDialogsListener(listener);
+    public void setAsListener() {
+        if(getView() == null) {
+            throw new IllegalStateException("View is null, cannot set listener");
+        } else {
+            ((WrapperLayout) getView()).addOnCloseDialogsListener(this);
+        }
     }
 
-    public void removeOnCloseDialogsListener(WrapperLayout.OnCloseDialogsListener listener) {
-        ((WrapperLayout) getView()).removeOnCloseDialogsListener(listener);
+    public void removeAsListener() {
+        if(getView() != null) {
+            ((WrapperLayout) getView()).removeOnCloseDialogsListener(this);
+        }
     }
 }

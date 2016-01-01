@@ -10,7 +10,6 @@ import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -21,10 +20,11 @@ import android.widget.FrameLayout;
  */
 public class Portal<T extends PortalAdapter> extends ContextWrapper {
     private static final String TAG = "Portal";
+    View view;
+    private int layoutId = -1;
+
     protected final T portalAdapter;
-    protected View view;
     protected final WindowManager windowManager;
-    protected int layoutId = -1;
     protected WindowManager.LayoutParams layoutParams;
 
     public Portal(Context base, T portalAdapter) {
@@ -38,8 +38,8 @@ public class Portal<T extends PortalAdapter> extends ContextWrapper {
         setContentView(LayoutInflater.from(this).cloneInContext(this).inflate(layoutId, new FrameLayout(this), false));
     }
 
-    protected void setContentView(@NonNull View view) {
-        this.view = view;
+    protected void setContentView(View view) {
+        setView(view);
         setLayoutParams(view);
     }
 
@@ -48,8 +48,12 @@ public class Portal<T extends PortalAdapter> extends ContextWrapper {
         return layoutParams;
     }
 
+
     protected void setLayoutParams(View view) {
-        if(getView() == null) return;
+        if(getView() == null) {
+            layoutParams = null;
+            return;
+        }
         if (view.getLayoutParams() instanceof WindowManager.LayoutParams) {
             layoutParams = (WindowManager.LayoutParams) view.getLayoutParams();
         } else {
@@ -76,6 +80,10 @@ public class Portal<T extends PortalAdapter> extends ContextWrapper {
         return true;
     }
 
+    protected void onViewCreated() {
+
+    }
+
     public boolean attach() {
         if(getView() != null && !(isViewAttached())) {
             windowManager.addView(getView(), getLayoutParams());
@@ -91,10 +99,8 @@ public class Portal<T extends PortalAdapter> extends ContextWrapper {
 
     public void onConfigurationChanged(Configuration newConfig) {
         if(layoutId != -1) {
-            Log.d(TAG, "layoutId not null");
             boolean detached = detach();
-            if(detached) Log.d(TAG, "detached");
-            else Log.d(TAG, "onConfigurationChanged: not detached");
+            setContentView(null);
             setContentView(layoutId);
             if(detached) attach();
         }
@@ -113,6 +119,10 @@ public class Portal<T extends PortalAdapter> extends ContextWrapper {
         return false;
     }
 
+    protected void onDestroyView() {
+
+    }
+
     protected void onDestroy() {
     }
 
@@ -124,8 +134,21 @@ public class Portal<T extends PortalAdapter> extends ContextWrapper {
         }
     }
 
+    @Nullable
     public View getView() {
         return view;
+    }
+
+    protected void setView(View view) {
+        if (view == null && this.view != null) {
+            onDestroyView();
+        }
+
+        this.view = view;
+
+        if(view != null) {
+            onViewCreated();
+        }
     }
 
     public boolean isViewAttached() {
