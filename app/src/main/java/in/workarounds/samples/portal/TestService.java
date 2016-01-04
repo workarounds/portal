@@ -2,6 +2,8 @@ package in.workarounds.samples.portal;
 
 import android.support.annotation.NonNull;
 
+import com.squareup.leakcanary.RefWatcher;
+
 import in.workarounds.portal.OverlayPermissionHelper;
 import in.workarounds.portal.Portal;
 import in.workarounds.portal.PortalAdapter;
@@ -45,6 +47,14 @@ public class TestService extends PortalService {
         @Override
         public int getCount() {
             return 2;
+        }
+
+
+        @Override
+        public void close(int portalId) {
+            RefWatcher refWatcher = ExampleApplication.getRefWatcher(getContext());
+            refWatcher.watch(getPortal(portalId));
+            super.close(portalId);
         }
 
         @NonNull

@@ -2,6 +2,7 @@ package in.workarounds.samples.portal;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -10,6 +11,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+
+import com.squareup.leakcanary.RefWatcher;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -67,6 +70,19 @@ private static final String TAG = "TestMainPortal";
 
         activityForResultButton.setOnClickListener(this);
 
+    }
+
+    @Override
+    protected void onDestroyView() {
+        super.onDestroyView();
+        RefWatcher watcher = ExampleApplication.getRefWatcher(this);
+        watcher.watch(getView());
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Log.i(TAG, "onConfigurationChanged: ");
     }
 
     @Override
