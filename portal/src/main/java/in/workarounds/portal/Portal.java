@@ -16,41 +16,103 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 
 /**
- * Created by madki on 16/09/15.
+ * <p>
+ * Implements the behavior of the floating UIs. This is the main component of the library. Extend
+ * this to create your own floating UIs.
+ * </p>
+ *
+ * @param <T> the {@link PortalAdapter} that would instantiate this Portal
  */
 public class Portal<T extends PortalAdapter> extends ContextWrapper {
+    /**
+     * Tag for logging
+     */
     private static final String TAG = "Portal";
+
+    /**
+     * View that is set to the portal. Can be null. Use{@link #getView()} to get a reference to the view.
+     * Use {@link #setView(View)} or {@link #setContentView(View)} or {@link #setContentView(int)}
+     * to set it.
+     */
     View view;
+
+    /**
+     * Value of the layout resource set using {@link #setContentView(int)}. This is used to retrieve the
+     * resource again when orientation changes occur
+     */
+    @LayoutRes
     private int layoutId = -1;
 
+    /**
+     * Custom implementation of the {@link PortalAdapter} that instantiates this Portal. Can be null
+     */
+    @Nullable
     protected final T portalAdapter;
+
+    /**
+     * Cached value of the android window manager service
+     */
     protected final WindowManager windowManager;
+
+    /**
+     * LayoutParams that are used to attach the view to window. These are computed once when the
+     * view is initially set using {@link #setContentView(View)} or {@link #setContentView(int))
+     */
     protected WindowManager.LayoutParams layoutParams;
 
-    public Portal(Context base, T portalAdapter) {
+    /**
+     * @param base          context to which all the context calls are rerouted to
+     * @param portalAdapter custom implementation of {@link PortalAdapter} that instantiates this
+     *                      Portal. This can be null (but not recommended)
+     */
+    public Portal(Context base, @Nullable T portalAdapter) {
         super(base);
         this.portalAdapter = portalAdapter;
         windowManager = (WindowManager) base.getSystemService(WINDOW_SERVICE);
     }
 
+    /**
+     * Sets the view specified by the layoutId (calls the required callbacks). Saves the value of
+     * layoutId, sets the view and computes the layoutParams for the view
+     *
+     * @param layoutId id of the layout to be set
+     * @see #setContentView(View)
+     * @see #setView(View)
+     */
     protected void setContentView(@LayoutRes int layoutId) {
         this.layoutId = layoutId;
         setContentView(LayoutInflater.from(this).cloneInContext(this).inflate(layoutId, new FrameLayout(this), false));
     }
 
+    /**
+     * Sets the view and computes the layoutParams for the view
+     *
+     * @param view to be set as the view
+     * @see #setView(View)
+     * @see #setLayoutParams(View)
+     */
     protected void setContentView(View view) {
         setView(view);
         setLayoutParams(view);
     }
 
+    /**
+     * @return {@link #layoutParams}
+     */
     @Nullable
     protected WindowManager.LayoutParams getLayoutParams() {
         return layoutParams;
     }
 
-
+    /**
+     * Computes the layoutParams from the given view and saves them in layoutParams field
+     * Converts the FrameLayout.LayoutParams of the view into WindowManager.LayoutParams
+     *
+     * @param view from which the params are to be inferred
+     * @see ParamUtils#transferMarginAndGravity(WindowManager.LayoutParams, FrameLayout.LayoutParams)
+     */
     protected void setLayoutParams(View view) {
-        if(getView() == null) {
+        if (getView() == null) {
             layoutParams = null;
             return;
         }
@@ -63,6 +125,15 @@ public class Portal<T extends PortalAdapter> extends ContextWrapper {
         }
     }
 
+    /**
+     * These params are the basic settings that makes it possible to attach the view as System
+     * alert (over other apps). The additional flags set here add the Portal as a system alert (over telephone calls) and
+     * split the touch between the portal and the background. The FLAG_NOT_FOCUSABLE flag is required
+     * if the app in the background is to receive the back button (this is the major change in params
+     * for {@link MainPortal})
+     *
+     * @return layoutParams that define the behavior of the portal
+     */
     @NonNull
     protected WindowManager.LayoutParams portalLayoutParams() {
         WindowManager.LayoutParams params = new WindowManager.LayoutParams();
@@ -73,19 +144,42 @@ public class Portal<T extends PortalAdapter> extends ContextWrapper {
         return params;
     }
 
+    /**
+     * Lifecycle method that is called immediately after the Portal is instantiated
+     *
+     * @param data that is passed using {@link Portals#open(int, Bundle, Context, Class)}
+     */
     protected void onCreate(@Nullable Bundle data) {
     }
 
+    /**
+     * Lifecycle method is called when data is sent using {@link Portals#send(int, Bundle, Context, Class)}
+     * or {@link Portals#sendToAll(Bundle, Context, Class)} if the Portal is open
+     * or {@link Portals#open(int, Bundle, Context, Class)} if the portal is already open
+     *
+     * @param data that is sent using the above methods
+     * @return true if the data is handled
+     */
     protected boolean onData(@Nullable Bundle data) {
         return true;
     }
 
+    /**
+     * Lifecycle method is called when the view is set for the first time. Use this to finding views
+     * and adding listeners
+     */
     protected void onViewCreated() {
 
     }
 
+    /**
+     * Attaches the Portal's view to the window if it's not null and isn't already attached. Calls
+     * the {@link #onViewAttached()} after the view is attached
+     *
+     * @return true if the view is not null and is not already attached
+     */
     public boolean attach() {
-        if(getView() != null && !(isViewAttached())) {
+        if (getView() != null && !(isViewAttached())) {
             windowManager.addView(getView(), getLayoutParams());
             onViewAttached();
             return true;
@@ -93,25 +187,46 @@ public class Portal<T extends PortalAdapter> extends ContextWrapper {
         return false;
     }
 
+    /**
+     * Lifecycle method called after the view is attached. This is similar to onResume functionality
+     * of an android Activity or Fragment.
+     */
     protected void onViewAttached() {
 
     }
 
+    /**
+     * Lifecycle method called when configuration changes occur. If a {@link #layoutId} is provided
+     * then the current view is detached and re-inflated from the layoutId. This is useful if the
+     * landscape and portrait layouts are different.
+     *
+     * @param newConfig new configuration
+     */
     public void onConfigurationChanged(Configuration newConfig) {
-        if(layoutId != -1) {
+        if (layoutId != -1) {
             boolean detached = detach();
             setContentView(null);
             setContentView(layoutId);
-            if(detached) attach();
+            if (detached) attach();
         }
     }
 
+    /**
+     * Lifecycle method called before detaching the view from window. This is similar to onPause of
+     * the activity or fragment lifecycle
+     */
     protected void onDetachView() {
 
     }
 
+    /**
+     * Detaches the Portal's view from window if it's not null and attached to window. Calls
+     * {@link #onDetachView()} before detaching the view
+     *
+     * @return true if view is detached
+     */
     public boolean detach() {
-        if(isViewAttached()) {
+        if (isViewAttached()) {
             onDetachView();
             windowManager.removeView(getView());
             return true;
@@ -119,26 +234,49 @@ public class Portal<T extends PortalAdapter> extends ContextWrapper {
         return false;
     }
 
+    /**
+     * Lifecycle method called before destroying the view. Remove listeners or any references to the
+     * view
+     */
     protected void onDestroyView() {
 
     }
 
+    /**
+     * Lifecycle method called when before destroying the Portal. Release resources and remove all
+     * references to the portal
+     */
     protected void onDestroy() {
     }
 
+    /**
+     * Destroys the Portal if a portalAdapter has been set. Else just detaches the View from window
+     */
     public void finish() {
-        if(portalAdapter != null) {
+        if (portalAdapter != null) {
             portalAdapter.close(portalAdapter.indexOf(this));
         } else {
             detach();
         }
     }
 
+    /**
+     * @return the Portal's view
+     */
     @Nullable
     public View getView() {
         return view;
     }
 
+    /**
+     * Destroys the view already set to the portal(sets it to null and calls {@link #onDestroyView()})
+     * and assigns the new value of view. Does not check if the view's are equal. Does not detach
+     * the existing view if it's attached to the window. Make sure to {@link #detach()} the view
+     * else the reference to the view will be lost and there'd be no way to remove it from the
+     * window (stranded view)
+     *
+     * @param view to be set as the Portal's view
+     */
     protected void setView(View view) {
         if (view == null && this.view != null) {
             onDestroyView();
@@ -146,23 +284,43 @@ public class Portal<T extends PortalAdapter> extends ContextWrapper {
 
         this.view = view;
 
-        if(view != null) {
+        if (view != null) {
             onViewCreated();
         }
     }
 
+    /**
+     * @return true if view not null and is attached to window
+     */
     public boolean isViewAttached() {
         return getView() != null && getView().getWindowToken() != null;
     }
 
+    /**
+     * Finds the view with given id in Portal's view
+     *
+     * @param id of the view to be found
+     * @return view if found, else null
+     */
     @Nullable
     public View findViewById(@IdRes int id) {
-        if(getView() == null) return null;
+        if (getView() == null) return null;
         return getView().findViewById(id);
     }
 
+    /**
+     * Similar to onActivityResult of activity. The result of an activity started using
+     * {@link PortalAdapter#startActivityForResult(Intent, int)}
+     *
+     * @param requestCode request code of the request
+     * @param resultCode  value to indicate if the result is ok, cancelled or destroyed
+     *                    {@link MockActivity#RESULT_OK}, {@link MockActivity#RESULT_CANCELLED} or
+     *                    {@link MockActivity#RESULT_DESTROYED}
+     * @param result      the result sent back by the activity
+     * @return true if the result is handled
+     */
     public boolean onActivityResult(int requestCode, int resultCode, Intent result) {
-       return false;
+        return false;
     }
 
 }

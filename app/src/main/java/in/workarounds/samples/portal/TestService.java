@@ -13,7 +13,7 @@ import in.workarounds.portal.PortalService;
  * Created by madki on 28/12/15.
  */
 public class TestService extends PortalService {
-    @Override
+    @Override @NonNull
     protected PortalAdapter createPortalAdapter() {
         return new MyPortalAdapter(this);
     }

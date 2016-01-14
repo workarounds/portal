@@ -16,7 +16,30 @@ import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
 /**
- * Created by madki on 29/11/15.
+ * An implementation of the overlay permission helper.
+ * <p/>
+ * <h3>What it does</h3>
+ * <p>
+ * When on Android M the user hasn't yet granted the
+ * overlay permission and your app tries to show a portal this helper shows the user a notification
+ * (use {@link #preparePromptNotification(NotificationCompat.Builder)} to set it's title and content)
+ * If the user dismisses the notification the service and the portals are killed saying permission
+ * denied (override the behavior by overriding {@link #onPermissionDenied()}), if he clicks on it he
+ * is sent to the settings page where he's shown a toggle to grant overlay permission. At this point
+ * the message returned by {@link #getPermissionRationale()} is shown as toast to the user. If the
+ * user grants permission {@link #onPermissionApproved()} is called, he's shown another notification
+ * clicking on which will execute the queued intent and shows the portal which triggered the
+ * permission requirement.
+ * </p>
+ * <h3>How to override it</h3>
+ * <p>
+ * All methods are public or protected, so the class can be overridden to change the entire behavior.
+ * The flexibility is given as there is not one best way to deal with lack of permission. If the
+ * above flow seems fine to you then override all the abstract methods and additionally
+ * {@link #getPromptNotifContent()} and {@link #getApprovedNotifContent()}.
+ * But if you want to change the flow override {@link #promptForPermission(Intent)},
+ * {@link #onPermissionApproved()} and {@link #onPermissionDenied()}.
+ * </p>
  */
 public abstract class OverlayPermissionHelper {
     public static final int OVERLAY_PERMISSION_REQUEST = 1001;
@@ -69,6 +92,11 @@ public abstract class OverlayPermissionHelper {
                 .build();
     }
 
+    /**
+     * Applies style and priority settings to all notifications
+     * @param builder notification builder
+     * @return notification builder
+     */
     protected NotificationCompat.Builder prepareNotification(NotificationCompat.Builder builder) {
         return builder.setAutoCancel(true)
                 .setSmallIcon(getNotificationIcon())
@@ -77,10 +105,15 @@ public abstract class OverlayPermissionHelper {
                 .setColor(ContextCompat.getColor(context, getAccentColor()));
     }
 
+    /**
+     * Applies style and sets title and content for prompt notification
+     * @param builder notification builder
+     * @return notification builder
+     */
     protected NotificationCompat.Builder preparePromptNotification(NotificationCompat.Builder builder) {
         return prepareNotification(builder)
                 .setContentTitle(getAppName())
-                .setContentText("Draw over other apps permission required.");
+                .setContentText(getPromptNotifContent());
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -131,7 +164,7 @@ public abstract class OverlayPermissionHelper {
     protected NotificationCompat.Builder prepareApprovedNotification(NotificationCompat.Builder builder) {
         return prepareNotification(builder)
                 .setContentTitle(getAppName())
-                .setContentText("Permission approved. Click to continue");
+                .setContentText(getApprovedNotifContent());
     }
 
     protected PendingIntent approvedNotificationClick(int notifId) {
@@ -157,8 +190,10 @@ public abstract class OverlayPermissionHelper {
     }
 
     protected abstract String getAppName();
+
     @ColorRes
     protected abstract int getAccentColor();
+
     @DrawableRes
     protected abstract int getNotificationIcon();
 
@@ -168,7 +203,25 @@ public abstract class OverlayPermissionHelper {
                 || Settings.canDrawOverlays(context);
     }
 
+    /**
+     * @return Notification text which is shown when the user is prompted for overlay permission
+     */
+    protected String getPromptNotifContent() {
+       return "Draw over other apps permission required.";
+    }
+
+    /**
+     * @return Notification text which is shown once the user approves overlay permission
+     */
+    protected String getApprovedNotifContent() {
+       return "Permission approved. Click to continue";
+    }
+
+    /**
+     * The toast that should be shown when the user is navigated to the overlay permission setting
+     * @return string permission rationale
+     */
     public String getPermissionRationale() {
-        return "The application " + getAppName() +" needs 'Draw over other apps' permission to work.";
+        return "The application " + getAppName() + " needs 'Draw over other apps' permission to work.";
     }
 }
