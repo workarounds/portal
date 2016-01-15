@@ -1,6 +1,5 @@
 package in.workarounds.portal;
 
-import android.content.Context;
 import android.graphics.PixelFormat;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
@@ -15,11 +14,10 @@ public class MainPortal<T extends PortalAdapter> extends Portal<T> implements Wr
 
     /**
      * {@inheritDoc}
-     * @param base
      * @param portalAdapter
      */
-    public MainPortal(Context base, T portalAdapter) {
-        super(base, portalAdapter);
+    public MainPortal(T portalAdapter) {
+        super(portalAdapter);
     }
 
     /**

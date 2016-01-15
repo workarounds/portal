@@ -1,6 +1,5 @@
 package in.workarounds.samples.portal;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
@@ -40,8 +39,8 @@ private static final String TAG = "TestMainPortal";
     Button activityForResultButton;
 
 
-    public TestMainPortal(Context base, TestService.MyPortalAdapter portalAdapter) {
-        super(base, portalAdapter);
+    public TestMainPortal(TestService.MyPortalAdapter portalAdapter) {
+        super(portalAdapter);
     }
 
     @Override

@@ -15,7 +15,7 @@ import in.workarounds.portal.PortalService;
 public class TestService extends PortalService {
     @Override @NonNull
     protected PortalAdapter createPortalAdapter() {
-        return new MyPortalAdapter(this);
+        return new MyPortalAdapter(this, R.style.AppTheme);
     }
 
     @Override
@@ -40,8 +40,8 @@ public class TestService extends PortalService {
 
     public static class MyPortalAdapter extends PortalAdapter<TestService> {
 
-        public MyPortalAdapter(TestService service) {
-            super(service);
+        public MyPortalAdapter(TestService service, int themeId) {
+            super(service, themeId);
         }
 
         @Override
@@ -53,7 +53,8 @@ public class TestService extends PortalService {
         @Override
         public void close(int portalId) {
             RefWatcher refWatcher = ExampleApplication.getRefWatcher(getContext());
-            refWatcher.watch(getPortal(portalId));
+            Portal p = getPortal(portalId);
+            if(p != null) refWatcher.watch(p);
             super.close(portalId);
         }
 
@@ -62,9 +63,9 @@ public class TestService extends PortalService {
         protected Portal createPortal(int portalId) {
             switch (portalId) {
                 case 0:
-                    return new TestPortal(service, this);
+                    return new TestPortal(this);
                 case 1:
-                    return new TestMainPortal(service, this);
+                    return new TestMainPortal(this);
                 default:
                     throw new IndexOutOfBoundsException("given portalId exceeds count");
             }

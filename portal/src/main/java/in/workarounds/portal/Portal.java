@@ -1,7 +1,6 @@
 package in.workarounds.portal;
 
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.PixelFormat;
@@ -10,6 +9,7 @@ import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -23,7 +23,7 @@ import android.widget.FrameLayout;
  *
  * @param <T> the {@link PortalAdapter} that would instantiate this Portal
  */
-public class Portal<T extends PortalAdapter> extends ContextWrapper {
+public class Portal<T extends PortalAdapter> extends ContextThemeWrapper {
     /**
      * Tag for logging
      */
@@ -52,7 +52,7 @@ public class Portal<T extends PortalAdapter> extends ContextWrapper {
     /**
      * Cached value of the android window manager service
      */
-    protected final WindowManager windowManager;
+    protected WindowManager windowManager;
 
     /**
      * LayoutParams that are used to attach the view to window. These are computed once when the
@@ -61,14 +61,11 @@ public class Portal<T extends PortalAdapter> extends ContextWrapper {
     protected WindowManager.LayoutParams layoutParams;
 
     /**
-     * @param base          context to which all the context calls are rerouted to
      * @param portalAdapter custom implementation of {@link PortalAdapter} that instantiates this
      *                      Portal. This can be null (but not recommended)
      */
-    public Portal(Context base, @Nullable T portalAdapter) {
-        super(base);
+    public Portal(@Nullable T portalAdapter) {
         this.portalAdapter = portalAdapter;
-        windowManager = (WindowManager) base.getSystemService(WINDOW_SERVICE);
     }
 
     /**
@@ -145,7 +142,22 @@ public class Portal<T extends PortalAdapter> extends ContextWrapper {
     }
 
     /**
-     * Lifecycle method that is called immediately after the Portal is instantiated
+     * Sets the base context and theme. Called immediately after portal instantiation
+     *
+     * @param base    base context
+     * @param themeId id of the theme
+     */
+    public void initThemedContext(Context base, int themeId) {
+        attachBaseContext(base);
+        if (themeId != -1) {
+            setTheme(themeId);
+        }
+    }
+
+    /**
+     * Lifecycle method that is called after instantiation. {@link #initThemedContext(Context, int)}
+     * is called before onCreate. So if each portal needs to have a different theme you can call
+     * {@link #setTheme(int)} in onCreate
      *
      * @param data that is passed using {@link Portals#open(int, Bundle, Context, Class)}
      */
@@ -180,7 +192,7 @@ public class Portal<T extends PortalAdapter> extends ContextWrapper {
      */
     public boolean attach() {
         if (getView() != null && !(isViewAttached())) {
-            windowManager.addView(getView(), getLayoutParams());
+            getWindowManager().addView(getView(), getLayoutParams());
             onViewAttached();
             return true;
         }
@@ -228,7 +240,7 @@ public class Portal<T extends PortalAdapter> extends ContextWrapper {
     public boolean detach() {
         if (isViewAttached()) {
             onDetachView();
-            windowManager.removeView(getView());
+            getWindowManager().removeView(getView());
             return true;
         }
         return false;
@@ -323,4 +335,11 @@ public class Portal<T extends PortalAdapter> extends ContextWrapper {
         return false;
     }
 
+    /**
+     * @return window manager
+     */
+    protected WindowManager getWindowManager() {
+        if (windowManager == null) windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+        return windowManager;
+    }
 }

@@ -43,10 +43,17 @@ public abstract class PortalAdapter<S extends Service & IPermissionManager> impl
     protected S service;
 
     /**
-     * @param service service that receives the intents and implements {@link IPermissionManager}
+     * The theme id to be set for all portals, pass -1 for no theme
      */
-    public PortalAdapter(S service) {
+    private int themeId;
+
+    /**
+     * @param service service that receives the intents and implements {@link IPermissionManager}
+     * @param themeId the theme to be set to all the portals, pass -1 for no theme
+     */
+    public PortalAdapter(S service, int themeId) {
         this.service = service;
+        this.themeId = themeId;
         portalCommands = new PortalCommands(this);
         initPortals();
     }
@@ -290,6 +297,7 @@ public abstract class PortalAdapter<S extends Service & IPermissionManager> impl
         Portal portal = getPortal(portalId);
         if (portal == null) {
             portal = createPortal(portalId);
+            portal.initThemedContext(getContext(), themeId);
             portal.onCreate(data);
             setPortal(portalId, portal);
             return true;

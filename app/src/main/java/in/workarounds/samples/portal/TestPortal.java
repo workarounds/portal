@@ -1,6 +1,5 @@
 package in.workarounds.samples.portal;
 
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -37,8 +36,8 @@ public class TestPortal extends Portal<TestService.MyPortalAdapter> implements V
     @Bind(R.id.btn_activity_for_result)
     Button activityForResultButton;
 
-    public TestPortal(Context base, TestService.MyPortalAdapter portalAdapter) {
-        super(base, portalAdapter);
+    public TestPortal(TestService.MyPortalAdapter portalAdapter) {
+        super(portalAdapter);
     }
 
     @Override
