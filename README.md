@@ -5,7 +5,7 @@ This library has the base architecture for making Facebook's chathead like UI. T
 The library is hosted in jcenter
 gradle dependency:
 ```
-compile 'in.workarounds.portal:portal:1.0.1'
+compile 'in.workarounds.portal:portal:1.0.2'
 ```
 License
 -------
