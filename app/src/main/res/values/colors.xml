@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="portal_permission_notification">@android:color/holo_green_light</color>
-    <color name="portal_foreground_notification">@android:color/holo_blue_light</color>
+    <color name="theme_primary">#FF9800</color>
+    <color name="theme_primary_dark">#F28402</color>
+    <color name="theme_accent">#327AB9</color>
+
 </resources>

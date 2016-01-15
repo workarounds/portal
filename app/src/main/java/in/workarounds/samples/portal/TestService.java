@@ -28,12 +28,12 @@ public class TestService extends PortalService {
 
             @Override
             protected int getAccentColor() {
-                return android.R.color.primary_text_dark;
+                return R.color.theme_accent;
             }
 
             @Override
             protected int getNotificationIcon() {
-                return R.drawable.app_icon;
+                return R.drawable.ic_notification;
             }
         };
     }
