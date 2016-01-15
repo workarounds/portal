@@ -56,7 +56,7 @@ public class Portal<T extends PortalAdapter> extends ContextThemeWrapper {
 
     /**
      * LayoutParams that are used to attach the view to window. These are computed once when the
-     * view is initially set using {@link #setContentView(View)} or {@link #setContentView(int))
+     * view is initially set using {@link #setContentView(View)} or {@link #setContentView(int)}
      */
     protected WindowManager.LayoutParams layoutParams;
 

@@ -17,12 +17,11 @@ import android.widget.Toast;
 
 /**
  * An implementation of the overlay permission helper.
- * <p/>
  * <h3>What it does</h3>
  * <p>
  * When on Android M the user hasn't yet granted the
  * overlay permission and your app tries to show a portal this helper shows the user a notification
- * (use {@link #preparePromptNotification(NotificationCompat.Builder)} to set it's title and content)
+ * (use #preparePromptNotification(NotificationCompat.Builder) to set it's title and content)
  * If the user dismisses the notification the service and the portals are killed saying permission
  * denied (override the behavior by overriding {@link #onPermissionDenied()}), if he clicks on it he
  * is sent to the settings page where he's shown a toggle to grant overlay permission. At this point
