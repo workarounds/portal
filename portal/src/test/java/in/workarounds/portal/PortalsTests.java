@@ -51,7 +51,7 @@ public class PortalsTests {
     }
 
     @Test
-    public void openIntent_serServiceClass() {
+    public void openIntent_setServiceClass() {
         Intent expected = new Intent(context, TEST_SERVICE_CLASS);
         assertTrue(expected.filterEquals(getOpenIntent()));
     }
