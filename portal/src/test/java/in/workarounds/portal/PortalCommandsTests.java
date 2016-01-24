@@ -27,11 +27,9 @@ public class PortalCommandsTests {
 
     PortalCommands portalCommands;
 
-    @Mock
     static Bundle DATA;
 
     private static final int TEST_PORTAL_ID = 1;
-    private static final Class<?> TEST_SERVICE_CLASS = PortalService.class;
     private static final String TEST_KEY = "key";
     private static final String TEST_STRING = "string";
 
@@ -258,7 +256,7 @@ public class PortalCommandsTests {
 
     // helper methods
     private void assertPortalId(int id, Bundle result) {
-        assertEquals(id, result.getInt(PortalCommandsBundler.Keys.DATA, -1));
+        assertEquals(id, result.getInt(PortalCommandsBundler.Keys.PORTAL_ID, -1));
     }
 
     private void assertIntentType(int intentType, Bundle result) {
