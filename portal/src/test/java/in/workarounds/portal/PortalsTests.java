@@ -24,7 +24,6 @@ import static org.junit.Assert.assertTrue;
 public class PortalsTests {
     @Mock
     Context context = RuntimeEnvironment.application.getApplicationContext();
-    @Mock
     static Bundle DATA;
 
     private static final int TEST_PORTAL_ID = 1;
