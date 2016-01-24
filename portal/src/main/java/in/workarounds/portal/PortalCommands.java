@@ -88,6 +88,7 @@ class PortalCommands implements IntentResolver {
     private void resetFields() {
         intentType = NO_TYPE;
         portalId = -1;
+        // TODO change default to null ?
         data = Bundle.EMPTY;
     }
 
@@ -115,6 +116,7 @@ class PortalCommands implements IntentResolver {
         return Bundler.portalCommands(CLOSE_MANAGER).bundle();
     }
 
+    // TODO remove @NonNull ?
     public static Bundle sendToAll(@NonNull Bundle data) {
         return Bundler.portalCommands(SEND_TO_ALL).data(data).bundle();
     }
