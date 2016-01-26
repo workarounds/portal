@@ -21,6 +21,10 @@ android {
     }
 }
 
+configurations {
+    provided
+}
+
 ext {
     bintrayRepo = 'maven'
     bintrayName = 'portal'
@@ -35,7 +39,7 @@ ext {
     siteUrl = 'https://github.com/workarounds/portal'
     gitUrl = 'https://github.com/workarounds/portal.git'
 
-    libraryVersion = '1.0.2'
+    libraryVersion = '1.0.3'
 
     developerId = 'workarounds'
     developerName = 'Workarounds'
@@ -50,15 +54,24 @@ ext {
     supportLibVersion = '23.1.1'
     espressoVersion = '2.2.1'
     runnerVersion = '0.4.1'
+    bundlerVersion = '0.1.1'
 }
 
+android.libraryVariants.all { variant ->
+    // Exclude the jar files from making its way into the final apk.
+    // Irrespective of what the path_to_libs_dir is the final jar files end up in libs dir.
+    variant.outputs.each { output ->
+        output.packageLibrary.exclude("libs/bundler-annotations-${bundlerVersion}.jar")
+    }
+}
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile "com.android.support:appcompat-v7:$supportLibVersion"
 
-    compile 'in.workarounds.bundler:bundler-annotations:0.0.3'
-    apt 'in.workarounds.bundler:bundler-compiler:0.0.5'
+    // compile time only dependency
+    provided "in.workarounds.bundler:bundler-annotations:$bundlerVersion"
+    apt "in.workarounds.bundler:bundler-compiler:$bundlerVersion"
 
     //Tests
     // Unit testing dependencies
