@@ -1,4 +1,8 @@
-# Portal
+Portal
+======
+
+[![Build Status](https://travis-ci.org/workarounds/portal.svg?branch=master)](https://travis-ci.org/workarounds/portal)
+
 This library has the base architecture for making Facebook's chathead like UI. Though drawing over other apps is becaming a common feature, there are no good guides or libraries for easily implementing this behavior. This library intends to be a good usable API for developing such applications. We have consolidated all the effort and experience gained from making the [Define](https://play.google.com/store/apps/details?id=in.workarounds.define) app. The feature set this library offers is not yet exhaustive. But this would be a good starting point.
 
 ### Using the library
