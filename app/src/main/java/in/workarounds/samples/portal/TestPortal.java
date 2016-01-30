@@ -36,8 +36,8 @@ public class TestPortal extends Portal<TestService.MyPortalAdapter> implements V
     @Bind(R.id.btn_activity_for_result)
     Button activityForResultButton;
 
-    public TestPortal(TestService.MyPortalAdapter portalAdapter) {
-        super(portalAdapter);
+    public TestPortal(TestService.MyPortalAdapter portalAdapter, int portalId) {
+        super(portalAdapter, portalId);
     }
 
     @Override

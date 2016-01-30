@@ -63,9 +63,9 @@ public class TestService extends PortalService {
         protected Portal createPortal(int portalId) {
             switch (portalId) {
                 case 0:
-                    return new TestPortal(this);
+                    return new TestPortal(this, 0);
                 case 1:
-                    return new TestMainPortal(this);
+                    return new TestMainPortal(this, 1);
                 default:
                     throw new IndexOutOfBoundsException("given portalId exceeds count");
             }

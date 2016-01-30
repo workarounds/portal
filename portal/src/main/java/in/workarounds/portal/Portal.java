@@ -44,10 +44,15 @@ public class Portal<T extends PortalAdapter> extends ContextThemeWrapper {
     private int layoutId = -1;
 
     /**
-     * Custom implementation of the {@link PortalAdapter} that instantiates this Portal. Can be null
+     * Custom implementation of the {@link PortalAdapter} that instantiates this Portal.
      */
-    @Nullable
+    @NonNull
     protected final T portalAdapter;
+
+    /**
+     * the id of the portal with which the adapter instantiated this portal
+     */
+    private final int portalId;
 
     /**
      * Cached value of the android window manager service
@@ -62,10 +67,13 @@ public class Portal<T extends PortalAdapter> extends ContextThemeWrapper {
 
     /**
      * @param portalAdapter custom implementation of {@link PortalAdapter} that instantiates this
-     *                      Portal. This can be null (but not recommended)
+     *                      Portal.
+     * @param portalId      the id of the portal with which the adapter instantiated this portal
      */
-    public Portal(@Nullable T portalAdapter) {
+    public Portal(@NonNull T portalAdapter, int portalId) {
         this.portalAdapter = portalAdapter;
+        portalAdapter.throwIfInvalidId(portalId);
+        this.portalId = portalId;
     }
 
     /**
@@ -265,11 +273,10 @@ public class Portal<T extends PortalAdapter> extends ContextThemeWrapper {
      * Destroys the Portal if a portalAdapter has been set. Else just detaches the View from window
      */
     public void finish() {
-        if (portalAdapter != null) {
-            portalAdapter.close(portalAdapter.indexOf(this));
-        } else {
-            detach();
-        }
+        portalAdapter.close(portalId);
+        // if for some reason portalAdapter doesn't have a reference to this portal
+        // this ensures that the portal's view is detached from window
+        detach();
     }
 
     /**

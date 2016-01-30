@@ -39,8 +39,8 @@ private static final String TAG = "TestMainPortal";
     Button activityForResultButton;
 
 
-    public TestMainPortal(TestService.MyPortalAdapter portalAdapter) {
-        super(portalAdapter);
+    public TestMainPortal(TestService.MyPortalAdapter portalAdapter, int portalId) {
+        super(portalAdapter, portalId);
     }
 
     @Override

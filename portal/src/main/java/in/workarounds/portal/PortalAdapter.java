@@ -320,7 +320,7 @@ public abstract class PortalAdapter<S extends Service & IPermissionManager> impl
      * {@link IllegalArgumentException} if not valid id
      * @param portalId id to be validated
      */
-    protected void throwIfInvalidId(int portalId) {
+    public void throwIfInvalidId(int portalId) {
         if (portalId < 0 || portalId >= getCount()) {
             throw new IllegalArgumentException("Invalid portal Id: " + portalId);
         }
@@ -332,15 +332,6 @@ public abstract class PortalAdapter<S extends Service & IPermissionManager> impl
      */
     public Context getContext() {
         return service;
-    }
-
-    /**
-     * Returns the index of give portal object in {@link #portals}
-     * @param portal the portal whose index is needed
-     * @return portal index in {@link #portals}
-     */
-    public int indexOf(Portal portal) {
-        return portals.indexOf(portal);
     }
 
 }

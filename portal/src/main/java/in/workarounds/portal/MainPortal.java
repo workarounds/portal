@@ -15,9 +15,10 @@ public class MainPortal<T extends PortalAdapter> extends Portal<T> implements Wr
     /**
      * {@inheritDoc}
      * @param portalAdapter
+     * @param portalId
      */
-    public MainPortal(T portalAdapter) {
-        super(portalAdapter);
+    public MainPortal(T portalAdapter, int portalId) {
+        super(portalAdapter, portalId);
     }
 
     /**
