@@ -66,6 +66,11 @@ public class Portal<T extends PortalAdapter> extends ContextThemeWrapper {
     protected WindowManager.LayoutParams layoutParams;
 
     /**
+     * boolean to indicate whether view is attached to window or not
+     */
+    protected boolean viewAttached = false;
+
+    /**
      * @param portalAdapter custom implementation of {@link PortalAdapter} that instantiates this
      *                      Portal.
      * @param portalId      the id of the portal with which the adapter instantiated this portal
@@ -200,6 +205,7 @@ public class Portal<T extends PortalAdapter> extends ContextThemeWrapper {
      */
     public boolean attach() {
         if (getView() != null && !(isViewAttached())) {
+            viewAttached = true;
             getWindowManager().addView(getView(), getLayoutParams());
             onViewAttached();
             return true;
@@ -249,6 +255,7 @@ public class Portal<T extends PortalAdapter> extends ContextThemeWrapper {
         if (isViewAttached()) {
             onDetachView();
             getWindowManager().removeView(getView());
+            viewAttached = false;
             return true;
         }
         return false;
@@ -312,7 +319,7 @@ public class Portal<T extends PortalAdapter> extends ContextThemeWrapper {
      * @return true if view not null and is attached to window
      */
     public boolean isViewAttached() {
-        return getView() != null && getView().getWindowToken() != null;
+        return viewAttached;
     }
 
     /**
