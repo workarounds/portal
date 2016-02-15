@@ -5,7 +5,7 @@ Portal
 
 This library has the base architecture for making Facebook's chathead like UI. Though drawing over other apps is becaming a common feature, there are no good guides or libraries for easily implementing this behavior. This library intends to be a good usable API for developing such applications. We have consolidated all the effort and experience gained from making the [Define](https://play.google.com/store/apps/details?id=in.workarounds.define) app. The feature set this library offers is not yet exhaustive. But this would be a good starting point.
 
-The sample in the project is more for testing purposes than demonstration. Do have a look at the source code of [Define](https://github.com/workaounds/define) to see how this library can be used effectively in a production app.
+The sample in the project is more for testing purposes than demonstration. Do have a look at the source code of [Define](https://github.com/workarounds/define) to see how this library can be used effectively in a production app.
 
 ### Using the library
 The library is hosted in jcenter
